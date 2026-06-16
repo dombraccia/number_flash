@@ -1,59 +1,43 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBCBCUxwnDtDbgPe1FdDXm-xTwBVcKlGnw",
-  authDomain: "number-flash-8e808.firebaseapp.com",
-  projectId: "number-flash-8e808",
-  storageBucket: "number-flash-8e808.firebasestorage.app",
-  messagingSenderId: "738887353689",
-  appId: "1:738887353689:web:359842cd0386ca290db848",
-  measurementId: "G-0GENB9ED6R"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// storage.js — Local Storage Manager (no Firebase, fully offline)
+const STORAGE_KEY = 'numflash_stats';
 
 const StorageManager = {
-    async getStats(userId) {
-        if (!userId) return {};
+    _getData() {
         try {
-            const docRef = doc(db, "users", userId);
-            const docSnap = await getDoc(docRef);
-            return docSnap.exists() ? docSnap.data().stats || {} : {};
-        } catch (e) {
-            console.error("Error getting stats:", e);
+            return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        } catch {
             return {};
         }
     },
 
-    async saveResult(userId, language, number, isCorrect, flipTime) {
-        if (!userId) return;
-        console.log(`Saving result: ${language} ${number}`, { isCorrect, flipTime });
-        const docRef = doc(db, "users", userId);
-        
-        // Firestore keys must be strings
+    _saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    },
+
+    getAllStats() {
+        return this._getData();
+    },
+
+    getStats(language) {
+        const data = this._getData();
+        return data[language] || {};
+    },
+
+    saveResult(language, number, isCorrect, flipTime) {
+        const data = this._getData();
+        if (!data[language]) data[language] = {};
+
         const numStr = String(number);
-        const path = `stats.${language}.${numStr}`;
-        
-        try {
-            await updateDoc(docRef, {
-                [`${path}.timesStudied`]: increment(1),
-                [`${path}.timesCorrect`]: isCorrect ? increment(1) : increment(0),
-                [`${path}.totalFlipTime`]: increment(flipTime)
-            });
-        } catch (e) {
-            console.warn("Doc update failed, trying merge...", e);
-            const statsUpdate = {};
-            statsUpdate[language] = {};
-            statsUpdate[language][numStr] = {
-                timesStudied: 1,
-                timesCorrect: isCorrect ? 1 : 0,
-                totalFlipTime: flipTime
-            };
-            await setDoc(docRef, { stats: statsUpdate }, { merge: true });
+        if (!data[language][numStr]) {
+            data[language][numStr] = { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
         }
+
+        data[language][numStr].timesStudied += 1;
+        if (isCorrect) data[language][numStr].timesCorrect += 1;
+        data[language][numStr].totalFlipTime += flipTime;
+
+        this._saveData(data);
     }
 };
 
-export { app, db, StorageManager };
+export { StorageManager };

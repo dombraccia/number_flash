@@ -2,60 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Learn numbers in French and Italian with flashcards. Works offline.">
+    <meta name="theme-color" content="#0a0a1a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NumFlash">
     <title>Number Flash</title>
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <link rel="icon" type="image/png" href="icon-512.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div id="app" class="hidden">
-        <!-- Login View -->
-        <section id="login-view" class="view">
-            <h1>Number Flash</h1>
-            <p style="text-align: center; color: #8E8E93;">Please sign in to access your stats.</p>
-            
-            <button id="google-login-btn" class="primary" style="display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20">
-                Sign in with Google
-            </button>
-
-            <div style="display: flex; align-items: center; margin: 10px 0;">
-                <hr style="flex: 1; border: 0; border-top: 1px solid #C7C7CC;">
-                <span style="padding: 0 10px; color: #8E8E93; font-size: 14px;">OR</span>
-                <hr style="flex: 1; border: 0; border-top: 1px solid #C7C7CC;">
-            </div>
-
-            <div class="setup-group">
-                <input type="email" id="login-email" placeholder="Email" style="padding: 12px; border-radius: 10px; border: 1px solid #C7C7CC;">
-                <input type="password" id="login-password" placeholder="Password" style="padding: 12px; border-radius: 10px; border: 1px solid #C7C7CC;">
-            </div>
-            <button id="login-btn" class="secondary">Sign in with Email</button>
-        </section>
-
         <!-- Home View -->
-        <section id="home-view" class="view hidden">
-            <header style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>Number Flash</h1>
-                <button id="logout-btn" style="background: none; color: var(--error-color); font-size: 14px; padding: 0;">Logout</button>
-            </header>
+        <section id="home-view" class="view">
+            <h1>Number Flash</h1>
             <div class="setup-group">
-                <label for="language-select">Target Language:</label>
+                <label for="language-select">Target Language</label>
                 <select id="language-select">
                     <option value="fr-FR">French</option>
                     <option value="it-IT">Italian</option>
                 </select>
             </div>
             <div class="setup-group">
-                <label for="range-select">Number Range:</label>
-                <select id="range-select">
-                    <option value="0-10">0 - 10</option>
-                    <option value="0-20">0 - 20</option>
-                    <option value="20-50">20 - 50</option>
-                    <option value="50-100">50 - 100</option>
-                    <option value="0-100">0 - 100</option>
-                </select>
+                <label>Number Range (0 - 100)</label>
+                <div class="range-inputs">
+                    <input type="number" id="range-min" min="0" max="100" value="0" placeholder="Min">
+                    <span class="range-separator">to</span>
+                    <input type="number" id="range-max" min="0" max="100" value="20" placeholder="Max">
+                </div>
+            </div>
+            <div class="setup-group">
+                <label for="reviews-count">Number of Reviews</label>
+                <input type="number" id="reviews-count" min="1" max="100" value="20">
             </div>
             <div class="actions">
                 <button id="start-btn" class="primary">Start Session</button>
@@ -65,6 +46,10 @@
 
         <!-- Session View -->
         <section id="session-view" class="view hidden">
+            <div class="session-header">
+                <button id="exit-btn" class="exit-link">✕ Exit</button>
+                <div id="session-progress" class="session-progress"></div>
+            </div>
             <div id="countdown" class="overlay hidden">3</div>
             <div id="card-container">
                 <div id="flashcard">
@@ -80,12 +65,27 @@
 
         <!-- Summary View -->
         <section id="summary-view" class="view hidden">
-            <h2>Session Summary</h2>
+            <h2>Session Complete</h2>
             <div id="summary-stats">
-                <p>Time: <span id="summary-time">0</span>s</p>
-                <p>Accuracy: <span id="summary-accuracy">0</span>%</p>
-                <p>Avg Time: <span id="summary-avg-time">0</span>s</p>
+                <div class="summary-card">
+                    <span class="summary-label">Time</span>
+                    <span class="summary-value"><span id="summary-time">0</span>s</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Accuracy</span>
+                    <span class="summary-value"><span id="summary-accuracy">0</span>%</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Avg Flip</span>
+                    <span class="summary-value"><span id="summary-avg-time">0</span>s</span>
+                </div>
             </div>
+
+            <div id="summary-results" class="summary-results-container hidden">
+                <h3>Session Review (by difficulty)</h3>
+                <div id="summary-results-list" class="stats-list"></div>
+            </div>
+
             <button id="finish-btn" class="primary">Back to Home</button>
         </section>
 
@@ -95,7 +95,7 @@
                 <button id="stats-back-btn" class="back-link">← Back</button>
                 <h2>My Progress</h2>
             </header>
-            <div id="stats-list"></div>
+            <div id="stats-list" class="stats-list"></div>
         </section>
     </div>
 
