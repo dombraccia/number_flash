@@ -33,7 +33,15 @@ const elements = {
     progress: document.getElementById('session-progress'),
     exitBtn: document.getElementById('exit-btn'),
     summaryResults: document.getElementById('summary-results'),
-    summaryResultsList: document.getElementById('summary-results-list')
+    summaryResultsList: document.getElementById('summary-results-list'),
+    settingsBtn: document.getElementById('settings-btn'),
+    settingsModal: document.getElementById('settings-modal'),
+    settingsCloseBtn: document.getElementById('settings-close-btn'),
+    settingDarkMode: document.getElementById('setting-dark-mode'),
+    settingShowPercent: document.getElementById('setting-show-percent'),
+    settingShowAvgTime: document.getElementById('setting-show-avg-time'),
+    cardOrderBtn: document.getElementById('card-order-btn'),
+    summaryTitle: document.getElementById('summary-title')
 };
 
 // State
@@ -45,7 +53,57 @@ let sessionData = {
     results: []
 };
 
-// Preference Persistence
+let canFlipCard = true;
+
+let appSettings = {
+    darkMode: true,
+    showPercent: true,
+    showAvgTime: true,
+    randomOrder: true
+};
+
+// Settings & Preferences Persistence
+function loadSettings() {
+    const dm = localStorage.getItem('numflash_dark_mode');
+    const sp = localStorage.getItem('numflash_show_percent');
+    const sat = localStorage.getItem('numflash_show_avg_time');
+    const ro = localStorage.getItem('numflash_random_order');
+
+    appSettings.darkMode = dm === null ? true : dm === 'true';
+    appSettings.showPercent = sp === null ? true : sp === 'true';
+    appSettings.showAvgTime = sat === null ? true : sat === 'true';
+    appSettings.randomOrder = ro === null ? true : ro === 'true';
+
+    elements.settingDarkMode.checked = appSettings.darkMode;
+    elements.settingShowPercent.checked = appSettings.showPercent;
+    elements.settingShowAvgTime.checked = appSettings.showAvgTime;
+
+    applyTheme();
+    updateCardOrderButtonState();
+}
+
+function applyTheme() {
+    if (appSettings.darkMode) {
+        document.body.classList.remove('light-theme');
+    } else {
+        document.body.classList.add('light-theme');
+    }
+}
+
+function updateCardOrderButtonState() {
+    if (appSettings.randomOrder) {
+        elements.cardOrderBtn.textContent = 'Random: ON';
+        elements.cardOrderBtn.classList.add('active');
+    } else {
+        elements.cardOrderBtn.textContent = 'Random: OFF';
+        elements.cardOrderBtn.classList.remove('active');
+    }
+}
+
+function saveSetting(key, value) {
+    localStorage.setItem(key, value);
+}
+
 function loadPreferences() {
     const lang = localStorage.getItem('numflash_lang');
     const rangeMin = localStorage.getItem('numflash_range_min');
@@ -67,6 +125,7 @@ function savePreferences() {
 
 // Initialize — go straight to home (no auth needed)
 loadPreferences();
+loadSettings();
 views.app.classList.remove('hidden');
 showView('home');
 
@@ -111,8 +170,13 @@ function startSession() {
     const allNumbers = [];
     for (let i = min; i <= max; i++) allNumbers.push(i);
 
-    const shuffled = allNumbers.sort(() => 0.5 - Math.random());
-    const sessionNumbers = shuffled.slice(0, reviews);
+    let sessionNumbers;
+    if (appSettings.randomOrder) {
+        const shuffled = allNumbers.sort(() => 0.5 - Math.random());
+        sessionNumbers = shuffled.slice(0, reviews);
+    } else {
+        sessionNumbers = allNumbers.slice(0, reviews);
+    }
 
     sessionData = {
         language: lang,
@@ -125,6 +189,7 @@ function startSession() {
     elements.summaryResults.classList.add('hidden');
 
     showView('session');
+    canFlipCard = false;
     runCountdown(() => showNextCard());
 }
 
@@ -157,12 +222,12 @@ function exitSession() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
-    showView('home');
+    endSession(true);
 }
 
 function showNextCard() {
     if (sessionData.currentIndex >= sessionData.numbers.length) {
-        endSession();
+        endSession(false);
         return;
     }
 
@@ -178,9 +243,15 @@ function showNextCard() {
     elements.progress.textContent = `${sessionData.currentIndex + 1} / ${sessionData.numbers.length}`;
 
     sessionData.cardStartTime = Date.now();
+
+    // Guard: enable flip only after the transition back to front is fully done
+    setTimeout(() => {
+        canFlipCard = true;
+    }, 100);
 }
 
 function flipCard() {
+    if (!canFlipCard) return;
     if (elements.flashcard.classList.contains('flipped')) return;
 
     const number = sessionData.numbers[sessionData.currentIndex];
@@ -205,6 +276,7 @@ function flipCard() {
 }
 
 function recordResult(isCorrect) {
+    canFlipCard = false; // Disable card tapping while transition runs
     const number = sessionData.numbers[sessionData.currentIndex];
     sessionData.results.push({
         number,
@@ -223,7 +295,70 @@ function recordResult(isCorrect) {
     setTimeout(() => showNextCard(), 400);
 }
 
-function endSession() {
+// Difficulty Calculation Helpers
+function getAccuracyLevel(percent) {
+    if (percent < 55) return 3;
+    if (percent < 70) return 2;
+    if (percent < 85) return 1;
+    return 0;
+}
+
+function getTimeLevel(avgTime) {
+    if (avgTime > 5) return 3;
+    if (avgTime > 4) return 2;
+    if (avgTime > 2) return 1;
+    return 0;
+}
+
+const DIFFICULTY_LEVELS = [
+    { className: 'learned', text: 'Learned' },
+    { className: 'getting-there', text: 'Getting There' },
+    { className: 'needs-improvement', text: 'Needs Work' },
+    { className: 'difficult', text: 'Difficult' }
+];
+
+function getCardStatsInfo(num, data, language) {
+    const timesStudied = data.timesStudied || 0;
+    const percent = timesStudied > 0 ? (data.timesCorrect / timesStudied) * 100 : 0;
+    
+    // Calculate recent average flip time
+    let recentAvgTime = 0;
+    if (data.recentFlipTimes && data.recentFlipTimes.length > 0) {
+        const sum = data.recentFlipTimes.reduce((a, b) => a + b, 0);
+        recentAvgTime = sum / data.recentFlipTimes.length;
+    } else if (timesStudied > 0) {
+        recentAvgTime = data.totalFlipTime / timesStudied;
+    }
+
+    const accuracyLevel = getAccuracyLevel(percent);
+    const timeLevel = getTimeLevel(recentAvgTime);
+    const worseLevel = timesStudied > 0 ? Math.max(accuracyLevel, timeLevel) : 0;
+
+    const word = NUMBER_DATA[language][num] || '';
+
+    return {
+        number: num,
+        word,
+        percent,
+        recentAvgTime,
+        worseLevel,
+        timesStudied
+    };
+}
+
+function renderBadgeContent(percent, avgTime, statusText) {
+    const parts = [];
+    if (appSettings.showPercent) {
+        parts.push(`${Math.round(percent)}%`);
+    }
+    if (appSettings.showAvgTime) {
+        parts.push(`${avgTime.toFixed(2)}s`);
+    }
+    parts.push(statusText);
+    return parts.join(' · ');
+}
+
+function endSession(isEarlyExit = false) {
     const totalSessionTime = (Date.now() - sessionData.totalStartTime) / 1000;
     const correctCount = sessionData.results.filter(r => r.isCorrect).length;
     const accuracy = sessionData.results.length > 0 ? Math.round((correctCount / sessionData.results.length) * 100) : 0;
@@ -233,6 +368,12 @@ function endSession() {
     elements.summaryAccuracy.textContent = accuracy;
     elements.summaryAvgTime.textContent = avgFlipTime;
 
+    if (isEarlyExit) {
+        elements.summaryTitle.textContent = "Session Ended Early";
+    } else {
+        elements.summaryTitle.textContent = "Session Complete";
+    }
+
     // Display session results sorted by difficulty
     const allStats = StorageManager.getAllStats();
     const langStats = allStats[sessionData.language] || {};
@@ -240,16 +381,14 @@ function endSession() {
     const sessionNumbersUnique = [...new Set(sessionData.results.map(r => r.number))];
     const statItems = sessionNumbersUnique.map(num => {
         const data = langStats[num] || langStats[String(num)] || { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
-        const percent = data.timesStudied > 0 ? (data.timesCorrect / data.timesStudied) * 100 : 0;
-        const avgTime = data.timesStudied > 0 ? (data.totalFlipTime / data.timesStudied) : 0;
-        const word = NUMBER_DATA[sessionData.language][num] || '';
-        return { number: num, word, percent, avgTime, data };
+        return getCardStatsInfo(num, data, sessionData.language);
     });
 
-    // Sort by difficulty: lowest accuracy (lowest percent) first, then longest avgFlipTime first
+    // Sort by difficulty: highest worseLevel first, then lowest accuracy, then longest recentAvgTime
     statItems.sort((a, b) => {
+        if (b.worseLevel !== a.worseLevel) return b.worseLevel - a.worseLevel;
         if (a.percent !== b.percent) return a.percent - b.percent;
-        return b.avgTime - a.avgTime;
+        return b.recentAvgTime - a.recentAvgTime;
     });
 
     elements.summaryResultsList.innerHTML = '';
@@ -258,25 +397,24 @@ function endSession() {
         const div = document.createElement('div');
         div.className = 'stat-item';
 
-        let difficultyClass = '';
-        let statusText = '';
-
-        if (item.percent < 55) { difficultyClass = 'difficult'; statusText = 'Difficult'; }
-        else if (item.percent < 70) { difficultyClass = 'needs-improvement'; statusText = 'Needs Work'; }
-        else if (item.percent < 85) { difficultyClass = 'getting-there'; statusText = 'Getting There'; }
-        else { difficultyClass = 'learned'; statusText = 'Learned'; }
+        const config = DIFFICULTY_LEVELS[item.worseLevel];
+        const badgeText = renderBadgeContent(item.percent, item.recentAvgTime, config.text);
 
         div.innerHTML = `
             <div class="stat-label">
                 <span class="stat-number">${item.number} <span class="stat-word-translation">— ${item.word}</span></span>
-                <span class="stat-details">${item.data.timesStudied} trials · Avg ${item.avgTime.toFixed(2)}s</span>
+                <span class="stat-details">${item.timesStudied} trials · Avg ${item.recentAvgTime.toFixed(2)}s</span>
             </div>
-            <span class="stat-badge ${difficultyClass}">${Math.round(item.percent)}% · ${statusText}</span>
+            <span class="stat-badge ${config.className}">${badgeText}</span>
         `;
         elements.summaryResultsList.appendChild(div);
     });
 
-    elements.summaryResults.classList.remove('hidden');
+    if (statItems.length > 0) {
+        elements.summaryResults.classList.remove('hidden');
+    } else {
+        elements.summaryResults.classList.add('hidden');
+    }
 
     showView('summary');
 }
@@ -291,46 +429,44 @@ function showStats() {
 
     const statItems = [];
     for (let i = 0; i <= 100; i++) {
-        // Check both number and string keys
         const data = langStats[i] || langStats[String(i)] || { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
-        const percent = data.timesStudied > 0 ? (data.timesCorrect / data.timesStudied) * 100 : null;
-        const avgTime = data.timesStudied > 0 ? (data.totalFlipTime / data.timesStudied) : 0;
-        statItems.push({ number: i, percent, avgTime, data });
+        if (data.timesStudied === 0) {
+            statItems.push({ number: i, isStudied: false });
+        } else {
+            const info = getCardStatsInfo(i, data, lang);
+            statItems.push({ ...info, isStudied: true });
+        }
     }
 
+    // Sort: studied cards first, sorted by worseLevel descending, then percent ascending, then recentAvgTime descending
     statItems.sort((a, b) => {
-        if (a.percent === null && b.percent === null) return 0;
-        if (a.percent === null) return 1;
-        if (b.percent === null) return -1;
+        if (!a.isStudied && !b.isStudied) return 0;
+        if (!a.isStudied) return 1;
+        if (!b.isStudied) return -1;
+        if (b.worseLevel !== a.worseLevel) return b.worseLevel - a.worseLevel;
         if (a.percent !== b.percent) return a.percent - b.percent;
-        return b.avgTime - a.avgTime;
+        return b.recentAvgTime - a.recentAvgTime;
     });
 
     elements.statsList.innerHTML = '';
     let studiedCount = 0;
 
     statItems.forEach(item => {
-        if (item.data.timesStudied === 0) return;
+        if (!item.isStudied) return;
         studiedCount++;
 
         const div = document.createElement('div');
         div.className = 'stat-item';
 
-        let difficultyClass = '';
-        let statusText = '';
+        const config = DIFFICULTY_LEVELS[item.worseLevel];
+        const badgeText = renderBadgeContent(item.percent, item.recentAvgTime, config.text);
 
-        if (item.percent < 55) { difficultyClass = 'difficult'; statusText = 'Difficult'; }
-        else if (item.percent < 70) { difficultyClass = 'needs-improvement'; statusText = 'Needs Work'; }
-        else if (item.percent < 85) { difficultyClass = 'getting-there'; statusText = 'Getting There'; }
-        else { difficultyClass = 'learned'; statusText = 'Learned'; }
-
-        const word = NUMBER_DATA[lang][item.number] || '';
         div.innerHTML = `
             <div class="stat-label">
-                <span class="stat-number">${item.number} <span class="stat-word-translation">— ${word}</span></span>
-                <span class="stat-details">${item.data.timesStudied} trials · Avg ${item.avgTime.toFixed(2)}s</span>
+                <span class="stat-number">${item.number} <span class="stat-word-translation">— ${item.word}</span></span>
+                <span class="stat-details">${item.timesStudied} trials · Avg ${item.recentAvgTime.toFixed(2)}s</span>
             </div>
-            <span class="stat-badge ${difficultyClass}">${Math.round(item.percent)}% · ${statusText}</span>
+            <span class="stat-badge ${config.className}">${badgeText}</span>
         `;
         elements.statsList.appendChild(div);
     });
@@ -362,3 +498,44 @@ elements.flashcard.addEventListener('click', flipCard);
 elements.incorrectBtn.addEventListener('click', () => recordResult(false));
 elements.correctBtn.addEventListener('click', () => recordResult(true));
 elements.exitBtn.addEventListener('click', exitSession);
+
+// Settings Dialog / Events
+elements.settingsBtn.addEventListener('click', () => {
+    elements.settingsModal.classList.remove('hidden');
+});
+elements.settingsCloseBtn.addEventListener('click', () => {
+    elements.settingsModal.classList.add('hidden');
+});
+elements.settingsModal.addEventListener('click', (e) => {
+    if (e.target === elements.settingsModal) {
+        elements.settingsModal.classList.add('hidden');
+    }
+});
+elements.settingDarkMode.addEventListener('change', (e) => {
+    appSettings.darkMode = e.target.checked;
+    saveSetting('numflash_dark_mode', appSettings.darkMode);
+    applyTheme();
+});
+elements.settingShowPercent.addEventListener('change', (e) => {
+    appSettings.showPercent = e.target.checked;
+    saveSetting('numflash_show_percent', appSettings.showPercent);
+    if (!views.summary.classList.contains('hidden')) {
+        endSession(elements.summaryTitle.textContent === "Session Ended Early");
+    } else if (!views.stats.classList.contains('hidden')) {
+        showStats();
+    }
+});
+elements.settingShowAvgTime.addEventListener('change', (e) => {
+    appSettings.showAvgTime = e.target.checked;
+    saveSetting('numflash_show_avg_time', appSettings.showAvgTime);
+    if (!views.summary.classList.contains('hidden')) {
+        endSession(elements.summaryTitle.textContent === "Session Ended Early");
+    } else if (!views.stats.classList.contains('hidden')) {
+        showStats();
+    }
+});
+elements.cardOrderBtn.addEventListener('click', () => {
+    appSettings.randomOrder = !appSettings.randomOrder;
+    saveSetting('numflash_random_order', appSettings.randomOrder);
+    updateCardOrderButtonState();
+});

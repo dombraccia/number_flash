@@ -18,7 +18,10 @@
     <div id="app" class="hidden">
         <!-- Home View -->
         <section id="home-view" class="view">
-            <h1>Number Flash</h1>
+            <header class="home-header">
+                <h1>Number Flash</h1>
+                <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
+            </header>
             <div class="setup-group">
                 <label for="language-select">Target Language</label>
                 <select id="language-select">
@@ -34,9 +37,15 @@
                     <input type="number" id="range-max" min="0" max="100" value="20" placeholder="Max">
                 </div>
             </div>
-            <div class="setup-group">
-                <label for="reviews-count">Number of Reviews</label>
-                <input type="number" id="reviews-count" min="1" max="100" value="20">
+            <div class="setup-row">
+                <div class="setup-group flex-1">
+                    <label for="reviews-count">Number of Reviews</label>
+                    <input type="number" id="reviews-count" min="1" max="100" value="20">
+                </div>
+                <div class="setup-group">
+                    <label for="card-order-btn">Card Order</label>
+                    <button id="card-order-btn" class="toggle-btn" type="button">Random: ON</button>
+                </div>
             </div>
             <div class="actions">
                 <button id="start-btn" class="primary">Start Session</button>
@@ -65,7 +74,7 @@
 
         <!-- Summary View -->
         <section id="summary-view" class="view hidden">
-            <h2>Session Complete</h2>
+            <h2 id="summary-title">Session Complete</h2>
             <div id="summary-stats">
                 <div class="summary-card">
                     <span class="summary-label">Time</span>
@@ -97,6 +106,48 @@
             </header>
             <div id="stats-list" class="stats-list"></div>
         </section>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h2>Settings</h2>
+                    <button id="settings-close-btn" class="close-btn" aria-label="Close Settings">✕</button>
+                </header>
+                <div class="settings-list">
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-title">Dark Mode</span>
+                            <span class="settings-desc">Enable standard dark theme styling</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="setting-dark-mode" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-title">Show Percentage</span>
+                            <span class="settings-desc">Display accuracy next to category</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="setting-show-percent" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-title">Show Average Time</span>
+                            <span class="settings-desc">Display response time next to category</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="setting-show-avg-time" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js" type="module"></script>

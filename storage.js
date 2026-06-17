@@ -29,12 +29,20 @@ const StorageManager = {
 
         const numStr = String(number);
         if (!data[language][numStr]) {
-            data[language][numStr] = { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
+            data[language][numStr] = { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0, recentFlipTimes: [] };
         }
 
         data[language][numStr].timesStudied += 1;
         if (isCorrect) data[language][numStr].timesCorrect += 1;
         data[language][numStr].totalFlipTime += flipTime;
+
+        if (!data[language][numStr].recentFlipTimes) {
+            data[language][numStr].recentFlipTimes = [];
+        }
+        data[language][numStr].recentFlipTimes.push(flipTime);
+        if (data[language][numStr].recentFlipTimes.length > 10) {
+            data[language][numStr].recentFlipTimes.shift();
+        }
 
         this._saveData(data);
     }
