@@ -1,101 +1,60 @@
-# Number Flash
+# ⚡ Number Flash
 
-A flashcard PWA for learning numbers in French and Italian. Works 100% offline after first load — no server, no login, no Firebase.
+Number Flash is a sleek, offline-first Progressive Web App (PWA) designed to help you master numbers in **French** (🇫🇷) and **Italian** (🇮🇹) from **0 to 200**. 
 
-## Features
-
-- 🇫🇷 French & 🇮🇹 Italian number flashcards (0–100)
-- 🎯 Configurable number ranges
-- 📊 Per-number accuracy and timing stats (stored on-device via localStorage)
-- 🔊 Text-to-speech pronunciation
-- 📱 Installable on iPhone home screen — works fully offline
+With smart difficulty tracking, audio pronunciations, and tailored review modes, you can practice on any device, anywhere—even without an internet connection.
 
 ---
 
-## Setup: What You Need to Do
+## 🌟 Key Features
 
-Everything below requires your credentials / device, so it can't be automated. Follow these steps in order.
-
-### Step 1 — Commit and push the refactored code
-
-Open a terminal in the project folder and run:
-
-```bash
-cd ~/apps/number_flash
-git add -A
-git commit -m "Refactor: offline PWA — remove Firebase, use localStorage"
-git push origin main
-```
-
-This pushes all changes to your existing repo at:
-**https://github.com/dombraccia/number_flash**
-
-### Step 2 — Enable GitHub Pages
-
-1. Go to **https://github.com/dombraccia/number_flash/settings/pages**
-2. Under **"Build and deployment"**:
-   - **Source**: select **Deploy from a branch**
-   - **Branch**: select **`main`** and **`/ (root)`**
-3. Click **Save**
-4. Wait 1–2 minutes for the deployment to complete
-5. Your app will be live at:
-
-   **https://dombraccia.github.io/number_flash/**
-
-> **Tip:** You can check deployment status at  
-> https://github.com/dombraccia/number_flash/actions
-
-### Step 3 — Add to iPhone home screen
-
-1. Open **Safari** on your iPhone (this does **not** work from Chrome or other browsers)
-2. Navigate to **https://dombraccia.github.io/number_flash/**
-3. Tap the **Share** button (the square icon with an upward arrow at the bottom of the screen)
-4. Scroll down and tap **"Add to Home Screen"**
-5. Optionally rename it (default will be "NumFlash"), then tap **Add**
-
-The app icon will appear on your home screen. From this point:
-- It launches **full-screen** (no Safari browser chrome)
-- It works **100% offline** — you can put your phone in airplane mode and it still runs
-- All your stats are saved **on-device** in localStorage
-
-### Step 4 — Future updates
-
-When you change the code and want the update to reach your phone:
-
-1. Commit and push changes to `main`:
-   ```bash
-   git add -A && git commit -m "your message" && git push origin main
-   ```
-2. GitHub Pages will automatically redeploy (1–2 min)
-3. **Important:** Bump the `CACHE_NAME` version in `sw.js` (e.g., `numflash-v3` → `numflash-v4`) so the service worker knows to re-download assets
-4. On your iPhone, open the app while connected to the internet — the service worker will silently update in the background
-5. Close and reopen the app to see the new version
+- **🇫🇷 French & 🇮🇹 Italian Support**: Practice numbers ranging from `0` to `200` with accurate pronunciation.
+- **🎯 Configurable Sessions**: Choose your target language, specify a custom number range, and select how many reviews you want to complete.
+- **🔀 Card Order Control**: Toggle between **Random** shuffling (default) or **Sequential** order (low to high) directly from the setup panel.
+- **🔊 Interactive Audio**: Hear native pronunciations automatically when a card is revealed, or tap any number card on your stats pages to repeat the pronunciation.
+- **🌙 Dynamic Themes**: Instantly switch between dark and light themes with the header toggle.
+- **📱 Installed PWA Support**: Add the app to your phone’s home screen. It runs full-screen, offline, with zero loading latency.
+- **🔒 Private & Local**: Your statistics, progress, and settings are saved 100% locally on your device's storage. No servers, no accounts, and no tracking.
 
 ---
 
-## Local Development
+## 📊 Smart Difficulty Tracking
 
-No build step, no npm, no dependencies. Serve with any static file server:
+Number Flash uses a dual-metric scoring system to evaluate your progress. For each number, it checks:
+1. **Accuracy**: Your lifetime correct-guess ratio.
+2. **Response Speed**: Your average reaction time across the **last 10 reviews** of that number.
 
-```bash
-npx -y serve .
-```
+The app compares both metrics and ranks the card according to the **worse measure** of the two, placing cards into four progress categories:
 
-Then open **http://localhost:3000** in your browser.
+| Category | Accuracy Range | Avg. Response Time |
+| :--- | :--- | :--- |
+| **🔴 Difficult** | Below 55% | Greater than 5 seconds |
+| **🟠 Needs Work** | 55% – 69% | 4 – 5 seconds |
+| **🟡 Getting There** | 70% – 84% | 2 – 4 seconds |
+| **🟢 Learned** | 85% or higher | Under 2 seconds |
 
 ---
 
-## Project Structure
+## 🎯 Tailored Review Modes
 
-```
-number_flash/
-├── index.html       ← App shell (single page)
-├── app.js           ← All app logic (session, stats, speech)
-├── data.js          ← French & Italian number dictionaries
-├── storage.js       ← localStorage wrapper for stats
-├── styles.css       ← Dark theme with glassmorphism
-├── sw.js            ← Service worker (offline caching)
-├── manifest.json    ← PWA manifest (icon, name, display mode)
-├── icon-512.png     ← App icon for home screen
-└── README.md
-```
+Practice smarter with custom targeted reviews:
+* **Retrain Weak Cards**: At the end of a session, if there are cards you haven't mastered yet (*Difficult*, *Needs Work*, or *Getting There*), you can tap **"Retrain Weak Cards"** to instantly launch a new practice session containing only those numbers.
+* **Progress Category Review**: On your **My Progress** page, select any combination of the four difficulty categories via checkboxes (e.g., practice only *Difficult* and *Needs Work* cards) and start a targeted review session of just those numbers.
+
+---
+
+## 📲 How to Install (Offline PWA)
+
+Number Flash works 100% offline once loaded. For the best full-screen experience, install it on your device:
+
+### iOS (iPhone / iPad)
+1. Open **Safari** and navigate to your deployed Number Flash website.
+2. Tap the **Share** button (the square icon with an upward arrow at the bottom of the screen).
+3. Scroll down and tap **"Add to Home Screen"**.
+4. Tap **Add** in the top-right corner.
+
+### Android
+1. Open **Chrome** and navigate to the website.
+2. Tap the three-dot menu button.
+3. Tap **"Install App"** (or **"Add to Home screen"**).
+4. Follow the prompt to complete the installation.
