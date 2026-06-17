@@ -767,21 +767,22 @@ elements.clearCacheBtn.addEventListener('click', () => {
 // Refresh App Option
 elements.refreshAppBtn.addEventListener('click', () => {
     elements.refreshAppBtn.disabled = true;
-    elements.refreshAppBtn.textContent = "Checking...";
+    elements.refreshAppBtn.textContent = "Updating...";
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistration().then(registration => {
-            if (registration) {
-                registration.update().then(() => {
-                    window.location.reload();
-                }).catch(err => {
-                    console.error('Service worker update failed:', err);
-                    window.location.reload();
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+            const promises = registrations.map(reg => reg.unregister());
+            return Promise.all(promises);
+        }).then(() => {
+            if ('caches' in window) {
+                return caches.keys().then(keys => {
+                    return Promise.all(keys.map(key => caches.delete(key)));
                 });
-            } else {
-                window.location.reload();
             }
-        }).catch(() => {
+        }).then(() => {
+            window.location.reload();
+        }).catch(err => {
+            console.error('Refresh failed, reloading anyway:', err);
             window.location.reload();
         });
     } else {
