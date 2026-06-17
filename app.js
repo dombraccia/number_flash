@@ -44,7 +44,6 @@ const elements = {
     summaryTitle: document.getElementById('summary-title'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
     settingReadAloud: document.getElementById('setting-read-aloud'),
-    settingOfflineMode: document.getElementById('setting-offline-mode'),
     retrainBtn: document.getElementById('retrain-btn'),
     filterDifficult: document.getElementById('filter-difficult'),
     filterNeedsWork: document.getElementById('filter-needs-work'),
@@ -73,8 +72,7 @@ let appSettings = {
     showPercent: false,
     showAvgTime: false,
     randomOrder: true,
-    readAloud: true,
-    offlineMode: false
+    readAloud: true
 };
 
 // Settings & Preferences Persistence
@@ -84,20 +82,17 @@ function loadSettings() {
     const sat = localStorage.getItem('numflash_show_avg_time');
     const ro = localStorage.getItem('numflash_random_order');
     const ra = localStorage.getItem('numflash_read_aloud');
-    const om = localStorage.getItem('numflash_offline_mode');
 
     appSettings.darkMode = dm === null ? true : dm === 'true';
     appSettings.showPercent = sp === null ? false : sp === 'true';
     appSettings.showAvgTime = sat === null ? false : sat === 'true';
     appSettings.randomOrder = ro === null ? true : ro === 'true';
     appSettings.readAloud = ra === null ? true : ra === 'true';
-    appSettings.offlineMode = om === null ? false : om === 'true';
 
     elements.settingDarkMode.checked = appSettings.darkMode;
     elements.settingShowPercent.checked = appSettings.showPercent;
     elements.settingShowAvgTime.checked = appSettings.showAvgTime;
     elements.settingReadAloud.checked = appSettings.readAloud;
-    elements.settingOfflineMode.checked = appSettings.offlineMode;
 
     applyTheme();
     updateCardOrderButtonState();
@@ -594,75 +589,25 @@ function updateStatsReviewButton() {
 }
 
 // Speech Utility
-function selectBestVoice(lang) {
-    const voices = window.speechSynthesis.getVoices();
-    const normalizedLang = lang.replace('_', '-').toLowerCase();
-    const langVoices = voices.filter(v => {
-        const vLang = v.lang.replace('_', '-').toLowerCase();
-        return vLang === normalizedLang || vLang.startsWith(normalizedLang);
-    });
-
-    if (langVoices.length === 0) return null;
-
-    let bestVoice = langVoices[0];
-    let bestScore = -1;
-
-    for (const voice of langVoices) {
-        let score = 0;
-        const name = voice.name.toLowerCase();
-
-        if (name.includes('natural')) score += 100;
-        if (name.includes('siri')) score += 90;
-        if (name.includes('enhanced')) score += 80;
-        if (name.includes('premium')) score += 70;
-        if (name.includes('google')) score += 50;
-        if (name.includes('compact')) score -= 20;
-
-        if (score > bestScore) {
-            bestScore = score;
-            bestVoice = voice;
-        }
-    }
-
-    return bestVoice;
-}
-
 function speak(text, lang) {
-    if (appSettings.offlineMode) {
-        speakOffline(text, lang);
-        return;
-    }
-
-    if (navigator.onLine) {
-        try {
-            const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text)}`;
-            const audio = new Audio(url);
-            audio.play().catch(err => {
-                console.warn('Online TTS playback failed, falling back to offline SpeechSynthesis:', err);
-                speakOffline(text, lang);
-            });
-        } catch (e) {
-            console.warn('Online TTS initialization failed, falling back:', e);
-            speakOffline(text, lang);
-        }
-    } else {
-        speakOffline(text, lang);
-    }
-}
-
-function speakOffline(text, lang) {
     try {
+        window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = lang;
 
-        const voice = selectBestVoice(lang);
+        const voices = window.speechSynthesis.getVoices();
+        const normalizedLang = lang.replace('_', '-').toLowerCase();
+        const voice = voices.find(v => {
+            const vLang = v.lang.replace('_', '-').toLowerCase();
+            return vLang === normalizedLang || vLang.startsWith(normalizedLang);
+        });
         if (voice) {
             utterance.voice = voice;
         }
 
         window.speechSynthesis.speak(utterance);
     } catch (e) {
-        console.warn('Offline speech synthesis failed:', e);
+        console.warn('Speech synthesis failed:', e);
     }
 }
 
@@ -726,11 +671,6 @@ elements.themeToggleBtn.addEventListener('click', () => {
 elements.settingReadAloud.addEventListener('change', (e) => {
     appSettings.readAloud = e.target.checked;
     saveSetting('numflash_read_aloud', appSettings.readAloud);
-});
-
-elements.settingOfflineMode.addEventListener('change', (e) => {
-    appSettings.offlineMode = e.target.checked;
-    saveSetting('numflash_offline_mode', appSettings.offlineMode);
 });
 
 elements.summaryResultsList.addEventListener('click', (e) => {
