@@ -654,22 +654,26 @@ elements.settingReadAloud.addEventListener('change', (e) => {
 });
 
 elements.summaryResultsList.addEventListener('click', (e) => {
-    const btn = e.target.closest('.speak-btn');
-    if (btn) {
-        e.stopPropagation();
-        const word = btn.getAttribute('data-word');
-        const l = btn.getAttribute('data-lang');
-        speak(word, l);
+    const card = e.target.closest('.stat-item');
+    if (card) {
+        const btn = card.querySelector('.speak-btn');
+        if (btn) {
+            const word = btn.getAttribute('data-word');
+            const l = btn.getAttribute('data-lang');
+            speak(word, l);
+        }
     }
 });
 
 elements.statsList.addEventListener('click', (e) => {
-    const btn = e.target.closest('.speak-btn');
-    if (btn) {
-        e.stopPropagation();
-        const word = btn.getAttribute('data-word');
-        const l = btn.getAttribute('data-lang');
-        speak(word, l);
+    const card = e.target.closest('.stat-item');
+    if (card) {
+        const btn = card.querySelector('.speak-btn');
+        if (btn) {
+            const word = btn.getAttribute('data-word');
+            const l = btn.getAttribute('data-lang');
+            speak(word, l);
+        }
     }
 });
 
