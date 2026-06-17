@@ -1049,3 +1049,79 @@ input:checked + .slider::before {
 .delete-btn:active {
     transform: scale(0.95);
 }
+
+/* ---- Home Footer & Info Modal ---- */
+.home-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.footer-link {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s var(--ease);
+    padding: 6px 12px;
+    border-radius: var(--r-sm);
+    height: auto;
+}
+
+.footer-link:hover {
+    color: var(--text-primary);
+    background: var(--surface);
+}
+
+.footer-link:active {
+    transform: scale(0.98);
+}
+
+.info-body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+.info-body strong {
+    color: var(--accent-1);
+}
+
+.info-footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.info-footer-text {
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.issue-link {
+    color: var(--accent-1);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    transition: color 0.2s;
+    word-break: break-all;
+}
+
+.issue-link:hover {
+    color: var(--accent-2);
+    text-decoration: underline;
+}

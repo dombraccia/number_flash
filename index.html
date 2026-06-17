@@ -54,6 +54,9 @@
                 <button id="start-btn" class="primary">Start Session</button>
                 <button id="stats-btn" class="secondary">View Stats</button>
             </div>
+            <footer class="home-footer">
+                <button id="info-btn" class="footer-link" type="button">ℹ️ About Number Flash</button>
+            </footer>
         </section>
 
         <!-- Session View -->
@@ -192,6 +195,24 @@
                             <span class="settings-desc">Deletes all offline statistics and settings</span>
                         </div>
                         <button id="clear-cache-btn" class="delete-btn" type="button">Clear Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Modal -->
+        <div id="info-modal" class="modal hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h2>About Number Flash</h2>
+                    <button id="info-close-btn" class="close-btn" aria-label="Close Info">✕</button>
+                </header>
+                <div class="info-body">
+                    <p>I love learning new languages, but no matter how close to fluent I get, learning how to say the numbers has always been a struggle for me.</p>
+                    <p>So, I made <strong>Number Flash</strong> as a way to train myself to recall number translations quicker.</p>
+                    <div class="info-footer-section">
+                        <p class="info-footer-text">If you find any bugs or have suggestions for improving the app, please drop them at:</p>
+                        <a href="https://github.com/dombraccia/number_flash/issues" target="_blank" rel="noopener" class="issue-link">github.com/dombraccia/number_flash/issues</a>
                     </div>
                 </div>
             </div>

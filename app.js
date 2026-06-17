@@ -50,7 +50,10 @@ const elements = {
     filterGettingThere: document.getElementById('filter-getting-there'),
     filterLearned: document.getElementById('filter-learned'),
     statsReviewBtn: document.getElementById('stats-review-btn'),
-    clearCacheBtn: document.getElementById('clear-cache-btn')
+    clearCacheBtn: document.getElementById('clear-cache-btn'),
+    infoBtn: document.getElementById('info-btn'),
+    infoModal: document.getElementById('info-modal'),
+    infoCloseBtn: document.getElementById('info-close-btn')
 };
 
 // State
@@ -763,5 +766,20 @@ elements.clearCacheBtn.addEventListener('click', () => {
         }
         
         window.location.reload();
+    }
+});
+
+// Info Modal Events
+elements.infoBtn.addEventListener('click', () => {
+    elements.infoModal.classList.remove('hidden');
+});
+
+elements.infoCloseBtn.addEventListener('click', () => {
+    elements.infoModal.classList.add('hidden');
+});
+
+elements.infoModal.addEventListener('click', (e) => {
+    if (e.target === elements.infoModal) {
+        elements.infoModal.classList.add('hidden');
     }
 });
