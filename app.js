@@ -43,7 +43,13 @@ const elements = {
     cardOrderBtn: document.getElementById('card-order-btn'),
     summaryTitle: document.getElementById('summary-title'),
     themeToggleBtn: document.getElementById('theme-toggle-btn'),
-    settingReadAloud: document.getElementById('setting-read-aloud')
+    settingReadAloud: document.getElementById('setting-read-aloud'),
+    retrainBtn: document.getElementById('retrain-btn'),
+    filterDifficult: document.getElementById('filter-difficult'),
+    filterNeedsWork: document.getElementById('filter-needs-work'),
+    filterGettingThere: document.getElementById('filter-getting-there'),
+    filterLearned: document.getElementById('filter-learned'),
+    statsReviewBtn: document.getElementById('stats-review-btn')
 };
 
 // State
@@ -59,8 +65,8 @@ let canFlipCard = true;
 
 let appSettings = {
     darkMode: true,
-    showPercent: true,
-    showAvgTime: true,
+    showPercent: false,
+    showAvgTime: false,
     randomOrder: true,
     readAloud: true
 };
@@ -74,8 +80,8 @@ function loadSettings() {
     const ra = localStorage.getItem('numflash_read_aloud');
 
     appSettings.darkMode = dm === null ? true : dm === 'true';
-    appSettings.showPercent = sp === null ? true : sp === 'true';
-    appSettings.showAvgTime = sat === null ? true : sat === 'true';
+    appSettings.showPercent = sp === null ? false : sp === 'true';
+    appSettings.showAvgTime = sat === null ? false : sat === 'true';
     appSettings.randomOrder = ro === null ? true : ro === 'true';
     appSettings.readAloud = ra === null ? true : ra === 'true';
 
@@ -185,6 +191,31 @@ function startSession() {
         sessionNumbers = shuffled.slice(0, reviews);
     } else {
         sessionNumbers = allNumbers.slice(0, reviews);
+    }
+
+    sessionData = {
+        language: lang,
+        numbers: sessionNumbers,
+        currentIndex: 0,
+        results: [],
+        totalStartTime: Date.now()
+    };
+
+    elements.summaryResults.classList.add('hidden');
+
+    showView('session');
+    canFlipCard = false;
+    runCountdown(() => showNextCard());
+}
+
+function startSessionWithCards(numbers) {
+    const lang = elements.langSelect.value;
+    
+    let sessionNumbers = [...numbers];
+    if (appSettings.randomOrder) {
+        sessionNumbers.sort(() => 0.5 - Math.random());
+    } else {
+        sessionNumbers.sort((a, b) => a - b);
     }
 
     sessionData = {
@@ -432,6 +463,16 @@ function endSession(isEarlyExit = false) {
         elements.summaryResults.classList.add('hidden');
     }
 
+    const weakNumbers = statItems.filter(item => item.worseLevel > 0).map(item => item.number);
+    sessionData.weakNumbers = weakNumbers;
+
+    if (weakNumbers.length > 0) {
+        elements.retrainBtn.classList.remove('hidden');
+        elements.retrainBtn.textContent = `Retrain Weak Cards (${weakNumbers.length})`;
+    } else {
+        elements.retrainBtn.classList.add('hidden');
+    }
+
     showView('summary');
 }
 
@@ -439,6 +480,13 @@ function endSession(isEarlyExit = false) {
 function showStats() {
     const lang = elements.langSelect.value;
     showView('stats');
+
+    // Reset category filter checkboxes
+    elements.filterDifficult.checked = false;
+    elements.filterNeedsWork.checked = false;
+    elements.filterGettingThere.checked = false;
+    elements.filterLearned.checked = false;
+    updateStatsReviewButton();
 
     const allStats = StorageManager.getAllStats();
     const langStats = allStats[lang] || {};
@@ -499,6 +547,40 @@ function showStats() {
                 <p class="empty-hint">Complete a session to see your progress here.</p>
             </div>
         `;
+    }
+}
+
+function updateStatsReviewButton() {
+    const lang = elements.langSelect.value;
+    const allStats = StorageManager.getAllStats();
+    const langStats = allStats[lang] || {};
+
+    const checkedLevels = [];
+    if (elements.filterDifficult.checked) checkedLevels.push(3);
+    if (elements.filterNeedsWork.checked) checkedLevels.push(2);
+    if (elements.filterGettingThere.checked) checkedLevels.push(1);
+    if (elements.filterLearned.checked) checkedLevels.push(0);
+
+    const cardsToReview = [];
+    if (checkedLevels.length > 0) {
+        for (let i = 0; i <= 100; i++) {
+            const data = langStats[i] || langStats[String(i)];
+            if (data && data.timesStudied > 0) {
+                const info = getCardStatsInfo(i, data, lang);
+                if (checkedLevels.includes(info.worseLevel)) {
+                    cardsToReview.push(i);
+                }
+            }
+        }
+    }
+
+    sessionData.selectedStatsCards = cardsToReview;
+
+    if (cardsToReview.length > 0) {
+        elements.statsReviewBtn.classList.remove('hidden');
+        elements.statsReviewBtn.textContent = `Review Selected (${cardsToReview.length})`;
+    } else {
+        elements.statsReviewBtn.classList.add('hidden');
     }
 }
 
@@ -588,5 +670,24 @@ elements.statsList.addEventListener('click', (e) => {
         const word = btn.getAttribute('data-word');
         const l = btn.getAttribute('data-lang');
         speak(word, l);
+    }
+});
+
+// Summary Page Retrain Option
+elements.retrainBtn.addEventListener('click', () => {
+    if (sessionData.weakNumbers && sessionData.weakNumbers.length > 0) {
+        startSessionWithCards(sessionData.weakNumbers);
+    }
+});
+
+// Stats Page Category Review Options
+elements.filterDifficult.addEventListener('change', updateStatsReviewButton);
+elements.filterNeedsWork.addEventListener('change', updateStatsReviewButton);
+elements.filterGettingThere.addEventListener('change', updateStatsReviewButton);
+elements.filterLearned.addEventListener('change', updateStatsReviewButton);
+
+elements.statsReviewBtn.addEventListener('click', () => {
+    if (sessionData.selectedStatsCards && sessionData.selectedStatsCards.length > 0) {
+        startSessionWithCards(sessionData.selectedStatsCards);
     }
 });

@@ -933,3 +933,95 @@ input:checked + .slider::before {
 .speak-btn:active {
     transform: scale(0.9);
 }
+
+/* ---- Stats Filter Styling ---- */
+.stats-filter-card {
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.custom-checkbox {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    border-radius: var(--r-sm);
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: all 0.2s var(--ease);
+    text-align: center;
+}
+
+.custom-checkbox:hover .checkbox-pill {
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.custom-checkbox.difficult input:checked + .checkbox-pill {
+    background: var(--error-bg);
+    border-color: var(--error);
+    color: var(--error);
+    box-shadow: 0 0 10px rgba(248, 113, 113, 0.15);
+}
+
+.custom-checkbox.needs-improvement input:checked + .checkbox-pill {
+    background: var(--needs-work-bg);
+    border-color: var(--needs-work);
+    color: var(--needs-work);
+    box-shadow: 0 0 10px rgba(251, 146, 60, 0.15);
+}
+
+.custom-checkbox.getting-there input:checked + .checkbox-pill {
+    background: var(--warning-bg);
+    border-color: var(--warning);
+    color: var(--warning);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.15);
+}
+
+.custom-checkbox.learned input:checked + .checkbox-pill {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+    box-shadow: 0 0 10px rgba(52, 211, 153, 0.15);
+}
+
+.full-width {
+    width: 100%;
+}

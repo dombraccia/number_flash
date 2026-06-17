@@ -98,7 +98,10 @@
                 <div id="summary-results-list" class="stats-list"></div>
             </div>
 
-            <button id="finish-btn" class="primary">Back to Home</button>
+            <div class="actions">
+                <button id="retrain-btn" class="primary hidden">Retrain Weak Cards</button>
+                <button id="finish-btn" class="secondary">Back to Home</button>
+            </div>
         </section>
 
         <!-- Stats View -->
@@ -107,6 +110,31 @@
                 <button id="stats-back-btn" class="back-link">← Back</button>
                 <h2>My Progress</h2>
             </header>
+            
+            <!-- Category Selector Block -->
+            <div id="stats-filter-container" class="stats-filter-card">
+                <span class="filter-title">Select categories to review:</span>
+                <div class="checkbox-group">
+                    <label class="custom-checkbox difficult">
+                        <input type="checkbox" id="filter-difficult">
+                        <span class="checkbox-pill">Difficult</span>
+                    </label>
+                    <label class="custom-checkbox needs-improvement">
+                        <input type="checkbox" id="filter-needs-work">
+                        <span class="checkbox-pill">Needs Work</span>
+                    </label>
+                    <label class="custom-checkbox getting-there">
+                        <input type="checkbox" id="filter-getting-there">
+                        <span class="checkbox-pill">Getting There</span>
+                    </label>
+                    <label class="custom-checkbox learned">
+                        <input type="checkbox" id="filter-learned">
+                        <span class="checkbox-pill">Learned</span>
+                    </label>
+                </div>
+                <button id="stats-review-btn" class="primary full-width hidden">Review Selected (0)</button>
+            </div>
+
             <div id="stats-list" class="stats-list"></div>
         </section>
 
@@ -134,7 +162,7 @@
                             <span class="settings-desc">Display accuracy next to category</span>
                         </div>
                         <label class="switch">
-                            <input type="checkbox" id="setting-show-percent" checked>
+                            <input type="checkbox" id="setting-show-percent">
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -144,7 +172,7 @@
                             <span class="settings-desc">Display response time next to category</span>
                         </div>
                         <label class="switch">
-                            <input type="checkbox" id="setting-show-avg-time" checked>
+                            <input type="checkbox" id="setting-show-avg-time">
                             <span class="slider round"></span>
                         </label>
                     </div>
