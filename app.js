@@ -52,6 +52,7 @@ const elements = {
     statsReviewBtn: document.getElementById('stats-review-btn'),
     clearCacheBtn: document.getElementById('clear-cache-btn'),
     refreshAppBtn: document.getElementById('refresh-app-btn'),
+    settingsVersion: document.getElementById('settings-version'),
     infoBtn: document.getElementById('info-btn'),
     infoModal: document.getElementById('info-modal'),
     infoCloseBtn: document.getElementById('info-close-btn')
@@ -143,9 +144,25 @@ function savePreferences() {
     localStorage.setItem('numflash_reviews_count', elements.reviewsCount.value);
 }
 
+function fetchAppVersion() {
+    fetch('./sw.js')
+        .then(r => r.text())
+        .then(text => {
+            const match = text.match(/const CACHE_NAME\s*=\s*['"`]([^'"`]+)['"`]/);
+            if (match && match[1]) {
+                const version = match[1].replace('numflash-', '');
+                elements.settingsVersion.textContent = `Version ${version}`;
+            }
+        }).catch(err => {
+            console.warn('Failed to parse app version from sw.js:', err);
+            elements.settingsVersion.textContent = 'Version unknown';
+        });
+}
+
 // Initialize — go straight to home (no auth needed)
 loadPreferences();
 loadSettings();
+fetchAppVersion();
 views.app.classList.remove('hidden');
 showView('home');
 

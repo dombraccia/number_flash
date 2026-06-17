@@ -1068,6 +1068,19 @@ input:checked + .slider::before {
     transform: scale(0.95);
 }
 
+.settings-version {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-light);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
 /* ---- Home Footer & Info Modal ---- */
 .home-footer {
     display: flex;
