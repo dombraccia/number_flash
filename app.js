@@ -42,7 +42,8 @@ const elements = {
     settingShowAvgTime: document.getElementById('setting-show-avg-time'),
     cardOrderBtn: document.getElementById('card-order-btn'),
     summaryTitle: document.getElementById('summary-title'),
-    themeToggleBtn: document.getElementById('theme-toggle-btn')
+    themeToggleBtn: document.getElementById('theme-toggle-btn'),
+    settingReadAloud: document.getElementById('setting-read-aloud')
 };
 
 // State
@@ -60,7 +61,8 @@ let appSettings = {
     darkMode: true,
     showPercent: true,
     showAvgTime: true,
-    randomOrder: true
+    randomOrder: true,
+    readAloud: true
 };
 
 // Settings & Preferences Persistence
@@ -69,15 +71,18 @@ function loadSettings() {
     const sp = localStorage.getItem('numflash_show_percent');
     const sat = localStorage.getItem('numflash_show_avg_time');
     const ro = localStorage.getItem('numflash_random_order');
+    const ra = localStorage.getItem('numflash_read_aloud');
 
     appSettings.darkMode = dm === null ? true : dm === 'true';
     appSettings.showPercent = sp === null ? true : sp === 'true';
     appSettings.showAvgTime = sat === null ? true : sat === 'true';
     appSettings.randomOrder = ro === null ? true : ro === 'true';
+    appSettings.readAloud = ra === null ? true : ra === 'true';
 
     elements.settingDarkMode.checked = appSettings.darkMode;
     elements.settingShowPercent.checked = appSettings.showPercent;
     elements.settingShowAvgTime.checked = appSettings.showAvgTime;
+    elements.settingReadAloud.checked = appSettings.readAloud;
 
     applyTheme();
     updateCardOrderButtonState();
@@ -272,10 +277,12 @@ function flipCard() {
     elements.flashcard.classList.add('flipped');
     elements.controls.classList.remove('hidden');
 
-    try {
-        speak(answer, lang);
-    } catch (e) {
-        console.warn('Speech API error:', e);
+    if (appSettings.readAloud) {
+        try {
+            speak(answer, lang);
+        } catch (e) {
+            console.warn('Speech API error:', e);
+        }
     }
 }
 
@@ -346,7 +353,8 @@ function getCardStatsInfo(num, data, language) {
         percent,
         recentAvgTime,
         worseLevel,
-        timesStudied
+        timesStudied,
+        language
     };
 }
 
@@ -406,7 +414,11 @@ function endSession(isEarlyExit = false) {
 
         div.innerHTML = `
             <div class="stat-label">
-                <span class="stat-number">${item.number} <span class="stat-word-translation">— ${item.word}</span></span>
+                <span class="stat-number">
+                    ${item.number} 
+                    <span class="stat-word-translation">— ${item.word}</span>
+                    <button class="speak-btn" data-word="${item.word}" data-lang="${sessionData.language}" title="Listen">🔊</button>
+                </span>
                 <span class="stat-details">${item.timesStudied} trials · Avg ${item.recentAvgTime.toFixed(2)}s</span>
             </div>
             <span class="stat-badge ${config.className}">${badgeText}</span>
@@ -467,7 +479,11 @@ function showStats() {
 
         div.innerHTML = `
             <div class="stat-label">
-                <span class="stat-number">${item.number} <span class="stat-word-translation">— ${item.word}</span></span>
+                <span class="stat-number">
+                    ${item.number} 
+                    <span class="stat-word-translation">— ${item.word}</span>
+                    <button class="speak-btn" data-word="${item.word}" data-lang="${lang}" title="Listen">🔊</button>
+                </span>
                 <span class="stat-details">${item.timesStudied} trials · Avg ${item.recentAvgTime.toFixed(2)}s</span>
             </div>
             <span class="stat-badge ${config.className}">${badgeText}</span>
@@ -548,4 +564,29 @@ elements.themeToggleBtn.addEventListener('click', () => {
     appSettings.darkMode = !appSettings.darkMode;
     saveSetting('numflash_dark_mode', appSettings.darkMode);
     applyTheme();
+});
+
+elements.settingReadAloud.addEventListener('change', (e) => {
+    appSettings.readAloud = e.target.checked;
+    saveSetting('numflash_read_aloud', appSettings.readAloud);
+});
+
+elements.summaryResultsList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.speak-btn');
+    if (btn) {
+        e.stopPropagation();
+        const word = btn.getAttribute('data-word');
+        const l = btn.getAttribute('data-lang');
+        speak(word, l);
+    }
+});
+
+elements.statsList.addEventListener('click', (e) => {
+    const btn = e.target.closest('.speak-btn');
+    if (btn) {
+        e.stopPropagation();
+        const word = btn.getAttribute('data-word');
+        const l = btn.getAttribute('data-lang');
+        speak(word, l);
+    }
 });
