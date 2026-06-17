@@ -24,3 +24,22 @@ export const NUMBER_DATA = {
         91: 'novantuno', 92: 'novantadue', 93: 'novantatré', 94: 'novantaquattro', 95: 'novantacinque', 96: 'novantasei', 97: 'novantasette', 98: 'novantotto', 99: 'novantanove', 100: 'cento'
     }
 };
+
+// Populate numbers 101 to 200 dynamically for French
+for (let i = 101; i <= 199; i++) {
+    const base = i - 100;
+    NUMBER_DATA['fr-FR'][i] = 'cent ' + NUMBER_DATA['fr-FR'][base];
+}
+NUMBER_DATA['fr-FR'][200] = 'deux cents';
+
+// Populate numbers 101 to 200 dynamically for Italian
+for (let i = 101; i <= 199; i++) {
+    const base = i - 100;
+    const baseStr = NUMBER_DATA['it-IT'][base];
+    if (baseStr.startsWith('o')) {
+        NUMBER_DATA['it-IT'][i] = 'cent' + baseStr;
+    } else {
+        NUMBER_DATA['it-IT'][i] = 'cento' + baseStr;
+    }
+}
+NUMBER_DATA['it-IT'][200] = 'duecento';

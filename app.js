@@ -169,8 +169,8 @@ function startSession() {
     if (isNaN(reviews) || reviews <= 0) reviews = 20;
 
     // Clamp range values to dictionary limits
-    min = Math.max(0, Math.min(100, min));
-    max = Math.max(0, Math.min(100, max));
+    min = Math.max(0, Math.min(200, min));
+    max = Math.max(0, Math.min(200, max));
 
     if (min > max) {
         const temp = min;
@@ -492,7 +492,7 @@ function showStats() {
     const langStats = allStats[lang] || {};
 
     const statItems = [];
-    for (let i = 0; i <= 100; i++) {
+    for (let i = 0; i <= 200; i++) {
         const data = langStats[i] || langStats[String(i)] || { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
         if (data.timesStudied === 0) {
             statItems.push({ number: i, isStudied: false });
@@ -563,7 +563,7 @@ function updateStatsReviewButton() {
 
     const cardsToReview = [];
     if (checkedLevels.length > 0) {
-        for (let i = 0; i <= 100; i++) {
+        for (let i = 0; i <= 200; i++) {
             const data = langStats[i] || langStats[String(i)];
             if (data && data.timesStudied > 0) {
                 const info = getCardStatsInfo(i, data, lang);
