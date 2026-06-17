@@ -585,9 +585,48 @@ function updateStatsReviewButton() {
 }
 
 // Speech Utility
+function selectBestVoice(lang) {
+    const voices = window.speechSynthesis.getVoices();
+    const normalizedLang = lang.replace('_', '-').toLowerCase();
+    const langVoices = voices.filter(v => {
+        const vLang = v.lang.replace('_', '-').toLowerCase();
+        return vLang === normalizedLang || vLang.startsWith(normalizedLang);
+    });
+
+    if (langVoices.length === 0) return null;
+
+    let bestVoice = langVoices[0];
+    let bestScore = -1;
+
+    for (const voice of langVoices) {
+        let score = 0;
+        const name = voice.name.toLowerCase();
+
+        if (name.includes('natural')) score += 100;
+        if (name.includes('siri')) score += 90;
+        if (name.includes('enhanced')) score += 80;
+        if (name.includes('premium')) score += 70;
+        if (name.includes('google')) score += 50;
+        if (name.includes('compact')) score -= 20;
+
+        if (score > bestScore) {
+            bestScore = score;
+            bestVoice = voice;
+        }
+    }
+
+    return bestVoice;
+}
+
 function speak(text, lang) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
+
+    const voice = selectBestVoice(lang);
+    if (voice) {
+        utterance.voice = voice;
+    }
+
     window.speechSynthesis.speak(utterance);
 }
 
