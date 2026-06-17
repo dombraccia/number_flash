@@ -521,6 +521,7 @@ button:active {
 
 #stats-list {
     max-height: 65vh;
+    margin-top: 12px;
 }
 
 .summary-results-container .stats-list {
