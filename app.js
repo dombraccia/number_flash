@@ -49,7 +49,8 @@ const elements = {
     filterNeedsWork: document.getElementById('filter-needs-work'),
     filterGettingThere: document.getElementById('filter-getting-there'),
     filterLearned: document.getElementById('filter-learned'),
-    statsReviewBtn: document.getElementById('stats-review-btn')
+    statsReviewBtn: document.getElementById('stats-review-btn'),
+    clearCacheBtn: document.getElementById('clear-cache-btn')
 };
 
 // State
@@ -732,5 +733,35 @@ elements.filterLearned.addEventListener('change', updateStatsReviewButton);
 elements.statsReviewBtn.addEventListener('click', () => {
     if (sessionData.selectedStatsCards && sessionData.selectedStatsCards.length > 0) {
         startSessionWithCards(sessionData.selectedStatsCards);
+    }
+});
+
+// Clear Cache & Reset App Data Option
+elements.clearCacheBtn.addEventListener('click', () => {
+    const confirmed = confirm("Are you sure you want to clear all stored statistics and reset your progress? This cannot be undone.");
+    if (confirmed) {
+        const keys = [
+            'numflash_stats',
+            'numflash_lang',
+            'numflash_range_min',
+            'numflash_range_max',
+            'numflash_reviews_count',
+            'numflash_dark_mode',
+            'numflash_show_percent',
+            'numflash_show_avg_time',
+            'numflash_random_order',
+            'numflash_read_aloud'
+        ];
+        keys.forEach(k => localStorage.removeItem(k));
+        
+        if ('caches' in window) {
+            caches.keys().then(names => {
+                for (let name of names) {
+                    caches.delete(name);
+                }
+            });
+        }
+        
+        window.location.reload();
     }
 });
