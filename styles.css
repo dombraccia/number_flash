@@ -735,7 +735,7 @@ body.light-theme {
     color: var(--text-primary);
     cursor: pointer;
     white-space: nowrap;
-    width: 100%;
+    width: 130px;
     transition: all 0.25s var(--ease);
     display: flex;
     align-items: center;
