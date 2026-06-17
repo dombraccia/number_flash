@@ -707,7 +707,7 @@ body.light-theme {
 
 .icon-btn:hover {
     background: var(--surface-hover);
-    transform: rotate(45deg) scale(1.05);
+    transform: scale(1.05);
 }
 
 .icon-btn:active {
