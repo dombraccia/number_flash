@@ -623,15 +623,37 @@ function selectBestVoice(lang) {
 }
 
 function speak(text, lang) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-
-    const voice = selectBestVoice(lang);
-    if (voice) {
-        utterance.voice = voice;
+    if (navigator.onLine) {
+        try {
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${lang}&client=tw-ob&q=${encodeURIComponent(text)}`;
+            const audio = new Audio(url);
+            audio.play().catch(err => {
+                console.warn('Online TTS playback failed, falling back to offline SpeechSynthesis:', err);
+                speakOffline(text, lang);
+            });
+        } catch (e) {
+            console.warn('Online TTS initialization failed, falling back:', e);
+            speakOffline(text, lang);
+        }
+    } else {
+        speakOffline(text, lang);
     }
+}
 
-    window.speechSynthesis.speak(utterance);
+function speakOffline(text, lang) {
+    try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = lang;
+
+        const voice = selectBestVoice(lang);
+        if (voice) {
+            utterance.voice = voice;
+        }
+
+        window.speechSynthesis.speak(utterance);
+    } catch (e) {
+        console.warn('Offline speech synthesis failed:', e);
+    }
 }
 
 // Event Listeners
