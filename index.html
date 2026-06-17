@@ -19,11 +19,9 @@
         <!-- Home View -->
         <section id="home-view" class="view">
             <header class="home-header">
+                <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Theme">🌙</button>
                 <h1>Number Flash</h1>
-                <div class="header-actions">
-                    <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Theme">🌙</button>
-                    <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
-                </div>
+                <button id="settings-btn" class="icon-btn" aria-label="Settings">⚙️</button>
             </header>
             <div class="setup-group">
                 <label for="language-select">Target Language</label>
@@ -152,6 +150,13 @@
                     <button id="settings-close-btn" class="close-btn" aria-label="Close Settings">✕</button>
                 </header>
                 <div class="settings-list">
+                    <div class="settings-item">
+                        <div class="settings-info">
+                            <span class="settings-title">Refresh App</span>
+                            <span class="settings-desc">Checks for updates and reloads the app</span>
+                        </div>
+                        <button id="refresh-app-btn" class="update-btn" type="button">Refresh</button>
+                    </div>
                     <div class="settings-item">
                         <div class="settings-info">
                             <span class="settings-title">Dark Mode</span>

@@ -51,6 +51,7 @@ const elements = {
     filterLearned: document.getElementById('filter-learned'),
     statsReviewBtn: document.getElementById('stats-review-btn'),
     clearCacheBtn: document.getElementById('clear-cache-btn'),
+    refreshAppBtn: document.getElementById('refresh-app-btn'),
     infoBtn: document.getElementById('info-btn'),
     infoModal: document.getElementById('info-modal'),
     infoCloseBtn: document.getElementById('info-close-btn')
@@ -742,6 +743,31 @@ elements.clearCacheBtn.addEventListener('click', () => {
             });
         }
         
+        window.location.reload();
+    }
+});
+
+// Refresh App Option
+elements.refreshAppBtn.addEventListener('click', () => {
+    elements.refreshAppBtn.disabled = true;
+    elements.refreshAppBtn.textContent = "Checking...";
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistration().then(registration => {
+            if (registration) {
+                registration.update().then(() => {
+                    window.location.reload();
+                }).catch(err => {
+                    console.error('Service worker update failed:', err);
+                    window.location.reload();
+                });
+            } else {
+                window.location.reload();
+            }
+        }).catch(() => {
+            window.location.reload();
+        });
+    } else {
         window.location.reload();
     }
 });
