@@ -41,7 +41,8 @@ const elements = {
     settingShowPercent: document.getElementById('setting-show-percent'),
     settingShowAvgTime: document.getElementById('setting-show-avg-time'),
     cardOrderBtn: document.getElementById('card-order-btn'),
-    summaryTitle: document.getElementById('summary-title')
+    summaryTitle: document.getElementById('summary-title'),
+    themeToggleBtn: document.getElementById('theme-toggle-btn')
 };
 
 // State
@@ -85,9 +86,12 @@ function loadSettings() {
 function applyTheme() {
     if (appSettings.darkMode) {
         document.body.classList.remove('light-theme');
+        elements.themeToggleBtn.textContent = '🌙';
     } else {
         document.body.classList.add('light-theme');
+        elements.themeToggleBtn.textContent = '☀️';
     }
+    elements.settingDarkMode.checked = appSettings.darkMode;
 }
 
 function updateCardOrderButtonState() {
@@ -538,4 +542,10 @@ elements.cardOrderBtn.addEventListener('click', () => {
     appSettings.randomOrder = !appSettings.randomOrder;
     saveSetting('numflash_random_order', appSettings.randomOrder);
     updateCardOrderButtonState();
+});
+
+elements.themeToggleBtn.addEventListener('click', () => {
+    appSettings.darkMode = !appSettings.darkMode;
+    saveSetting('numflash_dark_mode', appSettings.darkMode);
+    applyTheme();
 });

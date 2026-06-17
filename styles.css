@@ -683,6 +683,12 @@ body.light-theme {
     text-align: left;
 }
 
+.header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .icon-btn {
     background: var(--surface-raised);
     border: 1px solid var(--border-light);
