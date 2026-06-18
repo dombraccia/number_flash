@@ -95,3 +95,30 @@ for (let i = 101; i <= 999; i++) {
     }
 }
 NUMBER_DATA['es-ES'][1000] = 'mil';
+
+// Populate numbers 1001 to 1099 dynamically for French
+for (let i = 1001; i <= 1099; i++) {
+    const base = i - 1000;
+    NUMBER_DATA['fr-FR'][i] = 'mille ' + NUMBER_DATA['fr-FR'][base];
+}
+NUMBER_DATA['fr-FR'][1100] = 'mille cent';
+
+// Populate numbers 1001 to 1099 dynamically for Italian
+for (let i = 1001; i <= 1099; i++) {
+    const base = i - 1000;
+    const baseStr = NUMBER_DATA['it-IT'][base];
+    if (baseStr.startsWith('o')) {
+        NUMBER_DATA['it-IT'][i] = 'mill' + baseStr;
+    } else {
+        NUMBER_DATA['it-IT'][i] = 'mille' + baseStr;
+    }
+}
+NUMBER_DATA['it-IT'][1100] = 'millecento';
+
+// Populate numbers 1001 to 1099 dynamically for Spanish
+for (let i = 1001; i <= 1099; i++) {
+    const base = i - 1000;
+    NUMBER_DATA['es-ES'][i] = 'mil ' + NUMBER_DATA['es-ES'][base];
+}
+NUMBER_DATA['es-ES'][1100] = 'mil cien';
+

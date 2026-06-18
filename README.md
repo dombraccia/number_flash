@@ -29,11 +29,11 @@ Number Flash works 100% offline once loaded. For the best full-screen experience
 ## 🛠️ Supported Features & Languages
 
 * **Current Languages**: French (🇫🇷), Italian (🇮🇹), and Spanish (🇪🇸).
-* **Number Range**: Custom bounds supported from `0` to `1000`.
+* **Number Range**: Custom bounds supported from `0` to `1100`.
 * **Flow & Customization**:
   * **Card Order**: Toggle between **Random** and **Sequential** order.
   * **Auto Read Aloud**: Toggled automatic pronunciation on card flip.
-  * **Custom Reviews**: Select review lengths up to `1000` cards.
+  * **Custom Reviews**: Select review lengths up to `1100` cards.
   * **Dark Mode**: High contrast night mode styling toggle.
 * **Smart Difficulty Analytics**:
   * Tracks response times (rolling average of the last 10 flips) and accuracy percentages.
