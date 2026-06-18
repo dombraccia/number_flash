@@ -1,4 +1,4 @@
-const CACHE_NAME = 'numflash-v28';
+const CACHE_NAME = 'numflash-v29';
 const ASSETS = [
     './',
     './index.html',
