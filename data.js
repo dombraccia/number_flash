@@ -22,24 +22,76 @@ export const NUMBER_DATA = {
         71: 'settantuno', 72: 'settantadue', 73: 'settantatré', 74: 'settantaquattro', 75: 'settantacinque', 76: 'settantasei', 77: 'settantasette', 78: 'settantotto', 79: 'settantanove', 80: 'ottanta',
         81: 'ottantuno', 82: 'ottantadue', 83: 'ottantatré', 84: 'ottantaquattro', 85: 'ottantacinque', 86: 'ottantasei', 87: 'ottantasette', 88: 'ottantotto', 89: 'ottantanove', 90: 'novanta',
         91: 'novantuno', 92: 'novantadue', 93: 'novantatré', 94: 'novantaquattro', 95: 'novantacinque', 96: 'novantasei', 97: 'novantasette', 98: 'novantotto', 99: 'novantanove', 100: 'cento'
+    },
+    'es-ES': {
+        0: 'cero', 1: 'uno', 2: 'dos', 3: 'tres', 4: 'cuatro', 5: 'cinco', 6: 'seis', 7: 'siete', 8: 'ocho', 9: 'nueve', 10: 'diez',
+        11: 'once', 12: 'doce', 13: 'trece', 14: 'catorce', 15: 'quince', 16: 'dieciséis', 17: 'diecisiete', 18: 'dieciocho', 19: 'diecinueve', 20: 'veinte',
+        21: 'veintiuno', 22: 'veintidós', 23: 'veintitrés', 24: 'veinticuatro', 25: 'veinticinco', 26: 'veintiséis', 27: 'veintisiete', 28: 'veintiocho', 29: 'veintinueve', 30: 'treinta',
+        40: 'cuarenta', 50: 'cincuenta', 60: 'sesenta', 70: 'setenta', 80: 'ochenta', 90: 'noventa', 100: 'cien'
     }
 };
 
-// Populate numbers 101 to 200 dynamically for French
-for (let i = 101; i <= 199; i++) {
-    const base = i - 100;
-    NUMBER_DATA['fr-FR'][i] = 'cent ' + NUMBER_DATA['fr-FR'][base];
+// Populate numbers 31 to 99 dynamically for Spanish
+for (let i = 31; i <= 99; i++) {
+    if (NUMBER_DATA['es-ES'][i]) continue;
+    const ten = Math.floor(i / 10) * 10;
+    const unit = i % 10;
+    NUMBER_DATA['es-ES'][i] = NUMBER_DATA['es-ES'][ten] + ' y ' + NUMBER_DATA['es-ES'][unit];
 }
-NUMBER_DATA['fr-FR'][200] = 'deux cents';
 
-// Populate numbers 101 to 200 dynamically for Italian
-for (let i = 101; i <= 199; i++) {
-    const base = i - 100;
-    const baseStr = NUMBER_DATA['it-IT'][base];
-    if (baseStr.startsWith('o')) {
-        NUMBER_DATA['it-IT'][i] = 'cent' + baseStr;
+// Populate numbers 101 to 999 dynamically for French
+for (let i = 101; i <= 999; i++) {
+    const hundreds = Math.floor(i / 100);
+    const remainder = i % 100;
+    if (remainder === 0) {
+        const multiplier = NUMBER_DATA['fr-FR'][hundreds];
+        NUMBER_DATA['fr-FR'][i] = multiplier + ' cents';
     } else {
-        NUMBER_DATA['it-IT'][i] = 'cento' + baseStr;
+        const hundredsStr = hundreds === 1 ? 'cent' : NUMBER_DATA['fr-FR'][hundreds] + ' cent';
+        NUMBER_DATA['fr-FR'][i] = hundredsStr + ' ' + NUMBER_DATA['fr-FR'][remainder];
     }
 }
-NUMBER_DATA['it-IT'][200] = 'duecento';
+NUMBER_DATA['fr-FR'][1000] = 'mille';
+
+// Populate numbers 101 to 999 dynamically for Italian
+for (let i = 101; i <= 999; i++) {
+    const hundreds = Math.floor(i / 100);
+    const remainder = i % 100;
+    if (remainder === 0) {
+        const multiplier = NUMBER_DATA['it-IT'][hundreds];
+        NUMBER_DATA['it-IT'][i] = multiplier + 'cento';
+    } else {
+        const baseStr = NUMBER_DATA['it-IT'][remainder];
+        const multiplierStr = hundreds === 1 ? '' : NUMBER_DATA['it-IT'][hundreds];
+        if (baseStr.startsWith('o')) {
+            NUMBER_DATA['it-IT'][i] = multiplierStr + 'cent' + baseStr;
+        } else {
+            NUMBER_DATA['it-IT'][i] = multiplierStr + 'cento' + baseStr;
+        }
+    }
+}
+NUMBER_DATA['it-IT'][1000] = 'mille';
+
+// Populate numbers 101 to 999 dynamically for Spanish
+const esHundreds = {
+    1: 'ciento',
+    2: 'doscientos',
+    3: 'trescientos',
+    4: 'cuatrocientos',
+    5: 'quinientos',
+    6: 'seiscientos',
+    7: 'setecientos',
+    8: 'ochocientos',
+    9: 'novecientos'
+};
+
+for (let i = 101; i <= 999; i++) {
+    const hundreds = Math.floor(i / 100);
+    const remainder = i % 100;
+    if (remainder === 0) {
+        NUMBER_DATA['es-ES'][i] = hundreds === 1 ? 'cien' : esHundreds[hundreds];
+    } else {
+        NUMBER_DATA['es-ES'][i] = esHundreds[hundreds] + ' ' + NUMBER_DATA['es-ES'][remainder];
+    }
+}
+NUMBER_DATA['es-ES'][1000] = 'mil';

@@ -404,6 +404,18 @@ button:active {
     box-shadow: var(--shadow-md), var(--shadow-glow);
 }
 
+/* Prevent text bleeding through when flipped on desktop due to backdrop-filter/translucency rendering bugs */
+#flashcard.flipped .card-face.front {
+    visibility: hidden;
+    transition: visibility 0s linear 0.25s;
+}
+
+#flashcard:not(.flipped) .card-face.back {
+    visibility: hidden;
+    transition: visibility 0s linear 0.25s;
+}
+
+
 /* Correct / Incorrect Buttons */
 
 #session-controls {
