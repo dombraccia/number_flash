@@ -179,6 +179,17 @@ function showView(viewName) {
 // Session Logic
 let countdownInterval = null;
 
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = temp;
+    }
+    return shuffled;
+}
+
 function startSession() {
     savePreferences();
 
@@ -210,8 +221,7 @@ function startSession() {
 
     let sessionNumbers;
     if (appSettings.randomOrder) {
-        const shuffled = allNumbers.sort(() => 0.5 - Math.random());
-        sessionNumbers = shuffled.slice(0, reviews);
+        sessionNumbers = shuffleArray(allNumbers).slice(0, reviews);
     } else {
         sessionNumbers = allNumbers.slice(0, reviews);
     }
@@ -234,11 +244,11 @@ function startSession() {
 function startSessionWithCards(numbers) {
     const lang = elements.langSelect.value;
     
-    let sessionNumbers = [...numbers];
+    let sessionNumbers;
     if (appSettings.randomOrder) {
-        sessionNumbers.sort(() => 0.5 - Math.random());
+        sessionNumbers = shuffleArray(numbers);
     } else {
-        sessionNumbers.sort((a, b) => a - b);
+        sessionNumbers = [...numbers].sort((a, b) => a - b);
     }
 
     sessionData = {
