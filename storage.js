@@ -45,6 +45,31 @@ const StorageManager = {
         }
 
         this._saveData(data);
+    },
+
+    revertResult(language, number, isCorrect, flipTime) {
+        const data = this._getData();
+        if (!data[language]) return;
+
+        const numStr = String(number);
+        if (!data[language][numStr]) return;
+
+        const stats = data[language][numStr];
+        stats.timesStudied = Math.max(0, stats.timesStudied - 1);
+        if (isCorrect) {
+            stats.timesCorrect = Math.max(0, stats.timesCorrect - 1);
+        }
+        stats.totalFlipTime = Math.max(0, stats.totalFlipTime - flipTime);
+
+        if (stats.recentFlipTimes && stats.recentFlipTimes.length > 0) {
+            stats.recentFlipTimes.pop();
+        }
+
+        if (stats.timesStudied === 0) {
+            delete data[language][numStr];
+        }
+
+        this._saveData(data);
     }
 };
 

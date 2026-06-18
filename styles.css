@@ -282,6 +282,7 @@ button:active {
 }
 
 .session-header {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -289,6 +290,9 @@ button:active {
 }
 
 .session-progress {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 14px;
     font-weight: 600;
     color: var(--text-secondary);
@@ -312,6 +316,26 @@ button:active {
 }
 
 .exit-link:active {
+    transform: scale(0.95);
+}
+
+.undo-link {
+    background: none;
+    border: none;
+    color: var(--accent-1);
+    padding: 0;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s var(--ease);
+    border-radius: 0;
+}
+
+.undo-link:hover {
+    opacity: 0.8;
+}
+
+.undo-link:active {
     transform: scale(0.95);
 }
 

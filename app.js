@@ -53,6 +53,7 @@ const elements = {
     clearCacheBtn: document.getElementById('clear-cache-btn'),
     refreshAppBtn: document.getElementById('refresh-app-btn'),
     settingsVersion: document.getElementById('settings-version'),
+    undoBtn: document.getElementById('undo-btn'),
     infoBtn: document.getElementById('info-btn'),
     infoModal: document.getElementById('info-modal'),
     infoCloseBtn: document.getElementById('info-close-btn')
@@ -303,6 +304,13 @@ function showNextCard() {
 
     // Update progress indicator
     elements.progress.textContent = `${sessionData.currentIndex + 1} / ${sessionData.numbers.length}`;
+
+    // Update undo button visibility
+    if (sessionData.currentIndex > 0) {
+        elements.undoBtn.classList.remove('hidden');
+    } else {
+        elements.undoBtn.classList.add('hidden');
+    }
 
     sessionData.cardStartTime = Date.now();
 
@@ -629,6 +637,24 @@ function speak(text, lang) {
     }
 }
 
+function handleUndo() {
+    if (sessionData.currentIndex <= 0 || !canFlipCard) return;
+
+    canFlipCard = false;
+    const lastResult = sessionData.results.pop();
+    if (lastResult) {
+        StorageManager.revertResult(
+            sessionData.language,
+            lastResult.number,
+            lastResult.isCorrect,
+            lastResult.flipTime
+        );
+    }
+
+    sessionData.currentIndex--;
+    showNextCard();
+}
+
 // Event Listeners
 elements.startBtn.addEventListener('click', startSession);
 elements.statsBtn.addEventListener('click', showStats);
@@ -638,6 +664,7 @@ elements.flashcard.addEventListener('click', flipCard);
 elements.incorrectBtn.addEventListener('click', () => recordResult(false));
 elements.correctBtn.addEventListener('click', () => recordResult(true));
 elements.exitBtn.addEventListener('click', exitSession);
+elements.undoBtn.addEventListener('click', handleUndo);
 
 // Settings Dialog / Events
 elements.settingsBtn.addEventListener('click', () => {
