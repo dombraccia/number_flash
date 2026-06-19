@@ -108,17 +108,29 @@ for (let i = 1001; i <= 1099; i++) {
 }
 NUMBER_DATA['fr-FR'][1100] = 'mille cent';
 
-// Populate numbers 1001 to 1099 dynamically for Italian
-for (let i = 1001; i <= 1099; i++) {
-    const base = i - 1000;
-    const baseStr = NUMBER_DATA['it-IT'][base];
-    if (baseStr.startsWith('o')) {
-        NUMBER_DATA['it-IT'][i] = 'mill' + baseStr;
+// Populate numbers 1001 to 9999 dynamically for Italian
+for (let i = 1001; i <= 9999; i++) {
+    const thousands = Math.floor(i / 1000);
+    const remainder = i % 1000;
+    
+    if (remainder === 0) {
+        const multiplier = NUMBER_DATA['it-IT'][thousands];
+        NUMBER_DATA['it-IT'][i] = multiplier + 'mila';
     } else {
-        NUMBER_DATA['it-IT'][i] = 'mille' + baseStr;
+        const baseStr = NUMBER_DATA['it-IT'][remainder];
+        if (thousands === 1) {
+            if (baseStr.startsWith('o')) {
+                NUMBER_DATA['it-IT'][i] = 'mill' + baseStr;
+            } else {
+                NUMBER_DATA['it-IT'][i] = 'mille' + baseStr;
+            }
+        } else {
+            const multiplier = NUMBER_DATA['it-IT'][thousands];
+            NUMBER_DATA['it-IT'][i] = multiplier + 'mila' + baseStr;
+        }
     }
 }
-NUMBER_DATA['it-IT'][1100] = 'millecento';
+NUMBER_DATA['it-IT'][10000] = 'diecimila';
 
 // Populate numbers 1001 to 1099 dynamically for Spanish
 for (let i = 1001; i <= 1099; i++) {

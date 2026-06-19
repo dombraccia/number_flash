@@ -25,7 +25,7 @@ Number Flash is a free web application designed to help language learners improv
 ## ℹ More Information
 
 * **Current Languages**: French (🇫🇷), Italian (🇮🇹), Spanish (🇪🇸), Kannada (🇮🇳), and Mandarin (🇨🇳).
-* **Number Range**: Custom bounds supported up to `1100` (varies by language, e.g., `100` for Kannada, `1000` for Mandarin).
+* **Number Range**: Custom bounds supported up to `10,000` (varies by language, e.g., `100` for Kannada, `1000` for Mandarin, `10,000` for Italian).
 * **Flow & Customization**:
   * **Card Order**: Toggle between **Random** and **Sequential** order.
   * **Auto Read Aloud**: Toggled automatic pronunciation on card flip.
