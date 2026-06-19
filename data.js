@@ -30,9 +30,9 @@ export const NUMBER_DATA = {
         40: 'cuarenta', 50: 'cincuenta', 60: 'sesenta', 70: 'setenta', 80: 'ochenta', 90: 'noventa', 100: 'cien'
     },
     'kn-IN': {
-        0: 'ಸೊನ್ನೆ', 1: 'ಒಂದು', 2: 'ಎರಡು', 3: 'ಮೂರು', 4: 'ನಾಲ್ಕು', 5: 'ಐದು', 6: 'ಆರು', 7: 'ಏಳು', 8: 'ಎಂಟು', 9: 'ಒಂಬತ್ತು', 10: 'ಹತ್ತು',
-        11: 'ಹನ್ನೊಂದು', 12: 'ಹನ್ನೆರಡು', 13: 'ಹದಿಮೂರು', 14: 'ಹದಿನಾಲ್ಕು', 15: 'ಹದಿನೈದು', 16: 'ಹದಿನಾರು', 17: 'ಹದಿನೇಳು', 18: 'ಹದಿನೆಂಟು', 19: 'ಹತ್ತೊಂಬತ್ತು', 20: 'ಇಪ್ಪತ್ತು',
-        30: 'ಮೂವತ್ತು', 40: 'ನಲವತ್ತು', 50: 'ಐವತ್ತು', 60: 'ಅರವತ್ತು', 70: 'ಎಪ್ಪತ್ತು', 80: 'ಎಂಬತ್ತು', 90: 'ತೊಂಬತ್ತು', 100: 'ನೂರು'
+        0: 'ಸೊನ್ನೆ\nsonne', 1: 'ಒಂದು\nondu', 2: 'ಎರಡು\neradu', 3: 'ಮೂರು\nmooru', 4: 'ನಾಲ್ಕು\nnaalku', 5: 'ಐದು\naidu', 6: 'ಆರು\naaru', 7: 'ಏಳು\naelu', 8: 'ಎಂಟು\nentu', 9: 'ಒಂಬತ್ತು\nombattu', 10: 'ಹತ್ತು\nhattu',
+        11: 'ಹನ್ನೊಂದು\nhannondu', 12: 'ಹನ್ನೆರಡು\nhanneradu', 13: 'ಹದಿಮೂರು\nhadimooru', 14: 'ಹದಿನಾಲ್ಕು\nhadinaalku', 15: 'ಹದಿನೈದು\nhadinaidu', 16: 'ಹದಿನಾರು\nhadinaaru', 17: 'ಹದಿನೇಳು\nhadinelu', 18: 'ಹದಿನೆಂಟು\nhadinentu', 19: 'ಹತ್ತೊಂಬತ್ತು\nhattombattu', 20: 'ಇಪ್ಪತ್ತು\nippattu',
+        30: 'ಮೂವತ್ತು\nmoovattu', 40: 'ನಲವತ್ತು\nnalavattu', 50: 'ಐವತ್ತು\naivattu', 60: 'ಅರವತ್ತು\naravattu', 70: 'ಎಪ್ಪತ್ತು\neppattu', 80: 'ಎಂಬತ್ತು\nembattu', 90: 'ತೊಂಬತ್ತು\ntombattu', 100: 'ನೂರು\nnooru'
     }
 };
 
@@ -132,28 +132,45 @@ for (let i = 21; i <= 99; i++) {
     if (NUMBER_DATA['kn-IN'][i]) continue;
     const tenVal = Math.floor(i / 10) * 10;
     const unitVal = i % 10;
-    const tenWord = NUMBER_DATA['kn-IN'][tenVal];
+    const tenWordFull = NUMBER_DATA['kn-IN'][tenVal];
+    const [tenWord, tenTrans] = tenWordFull.split('\n');
+    
     const stem = tenWord.endsWith('ು') ? tenWord.slice(0, -1) : tenWord;
+    const stemTrans = tenTrans.endsWith('u') ? tenTrans.slice(0, -1) : tenTrans;
+    
+    let combinedWord = '';
+    let combinedTrans = '';
     
     if (unitVal === 1) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೊ' + 'ಂದು';
+        combinedWord = stem + 'ೊ' + 'ಂದು';
+        combinedTrans = stemTrans + 'ondu';
     } else if (unitVal === 2) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೆ' + 'ರಡು';
+        combinedWord = stem + 'ೆ' + 'ರಡು';
+        combinedTrans = stemTrans + 'eradu';
     } else if (unitVal === 3) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ಮೂರು';
+        combinedWord = stem + 'ಮೂರು';
+        combinedTrans = stemTrans + 'umooru';
     } else if (unitVal === 4) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ನಾಲ್ಕು';
+        combinedWord = stem + 'ನಾಲ್ಕು';
+        combinedTrans = stemTrans + 'unaalku';
     } else if (unitVal === 5) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೈ' + 'ದು';
+        combinedWord = stem + 'ೈ' + 'ದು';
+        combinedTrans = stemTrans + 'aidu';
     } else if (unitVal === 6) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ಾ' + 'ರು';
+        combinedWord = stem + 'ಾ' + 'ರು';
+        combinedTrans = stemTrans + 'aaru';
     } else if (unitVal === 7) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೇ' + 'ಳು';
+        combinedWord = stem + 'ೇ' + 'ಳು';
+        combinedTrans = stemTrans + 'aelu';
     } else if (unitVal === 8) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೆ' + 'ಂಟು';
+        combinedWord = stem + 'ೆ' + 'ಂಟು';
+        combinedTrans = stemTrans + 'entu';
     } else if (unitVal === 9) {
-        NUMBER_DATA['kn-IN'][i] = stem + 'ೊ' + 'ಂಬತ್ತು';
+        combinedWord = stem + 'ೊ' + 'ಂಬತ್ತು';
+        combinedTrans = stemTrans + 'ombattu';
     }
+    
+    NUMBER_DATA['kn-IN'][i] = `${combinedWord}\n${combinedTrans}`;
 }
 
 // Populate numbers 0 to 1000 dynamically for Mandarin (zh-CN)
@@ -171,7 +188,7 @@ const zhDigits = {
 };
 
 NUMBER_DATA['zh-CN'] = {};
-NUMBER_DATA['zh-CN'][0] = '零 (líng)';
+NUMBER_DATA['zh-CN'][0] = '零\nlíng';
 
 for (let i = 1; i <= 999; i++) {
     const charParts = [];
@@ -211,9 +228,9 @@ for (let i = 1; i <= 999; i++) {
     const charStr = charParts.join('');
     const pinyinStr = pinyinParts.join(' ');
     
-    NUMBER_DATA['zh-CN'][i] = `${charStr} (${pinyinStr})`;
+    NUMBER_DATA['zh-CN'][i] = `${charStr}\n${pinyinStr}`;
 }
-NUMBER_DATA['zh-CN'][1000] = '一千 (yī qiān)';
+NUMBER_DATA['zh-CN'][1000] = '一千\nyī qiān';
 
 
 

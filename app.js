@@ -56,7 +56,8 @@ const elements = {
     undoBtn: document.getElementById('undo-btn'),
     infoBtn: document.getElementById('info-btn'),
     infoModal: document.getElementById('info-modal'),
-    infoCloseBtn: document.getElementById('info-close-btn')
+    infoCloseBtn: document.getElementById('info-close-btn'),
+    settingDifficultyMode: document.getElementById('setting-difficulty-mode')
 };
 
 // State
@@ -75,7 +76,8 @@ let appSettings = {
     showPercent: false,
     showAvgTime: false,
     randomOrder: true,
-    readAloud: true
+    readAloud: true,
+    difficultyMode: 'medium'
 };
 
 // Settings & Preferences Persistence
@@ -85,17 +87,20 @@ function loadSettings() {
     const sat = localStorage.getItem('numflash_show_avg_time');
     const ro = localStorage.getItem('numflash_random_order');
     const ra = localStorage.getItem('numflash_read_aloud');
+    const diff = localStorage.getItem('numflash_difficulty_mode');
 
     appSettings.darkMode = dm === null ? true : dm === 'true';
     appSettings.showPercent = sp === null ? false : sp === 'true';
     appSettings.showAvgTime = sat === null ? false : sat === 'true';
     appSettings.randomOrder = ro === null ? true : ro === 'true';
     appSettings.readAloud = ra === null ? true : ra === 'true';
+    appSettings.difficultyMode = diff || 'medium';
 
     elements.settingDarkMode.checked = appSettings.darkMode;
     elements.settingShowPercent.checked = appSettings.showPercent;
     elements.settingShowAvgTime.checked = appSettings.showAvgTime;
     elements.settingReadAloud.checked = appSettings.readAloud;
+    elements.settingDifficultyMode.value = appSettings.difficultyMode;
 
     applyTheme();
     updateCardOrderButtonState();
@@ -401,18 +406,38 @@ function recordResult(isCorrect) {
     setTimeout(() => showNextCard(), 400);
 }
 
+// Difficulty Threshold Configurations
+const DIFFICULTY_THRESHOLDS = {
+    easy: {
+        accuracy: [40, 60, 80],
+        time: [6.0, 4.5, 3.0]
+    },
+    medium: {
+        accuracy: [55, 70, 85],
+        time: [5.0, 4.0, 2.0]
+    },
+    hard: {
+        accuracy: [70, 85, 95],
+        time: [4.0, 2.5, 1.2]
+    }
+};
+
 // Difficulty Calculation Helpers
 function getAccuracyLevel(percent) {
-    if (percent < 55) return 3;
-    if (percent < 70) return 2;
-    if (percent < 85) return 1;
+    const mode = appSettings.difficultyMode || 'medium';
+    const thresholds = DIFFICULTY_THRESHOLDS[mode].accuracy;
+    if (percent < thresholds[0]) return 3;
+    if (percent < thresholds[1]) return 2;
+    if (percent < thresholds[2]) return 1;
     return 0;
 }
 
 function getTimeLevel(avgTime) {
-    if (avgTime > 5) return 3;
-    if (avgTime > 4) return 2;
-    if (avgTime > 2) return 1;
+    const mode = appSettings.difficultyMode || 'medium';
+    const thresholds = DIFFICULTY_THRESHOLDS[mode].time;
+    if (avgTime > thresholds[0]) return 3;
+    if (avgTime > thresholds[1]) return 2;
+    if (avgTime > thresholds[2]) return 1;
     return 0;
 }
 
@@ -654,7 +679,7 @@ function updateStatsReviewButton() {
 function speak(text, lang) {
     try {
         window.speechSynthesis.cancel();
-        const cleanText = text.replace(/\s*\(.*?\)/g, '');
+        const cleanText = text.split('\n')[0].replace(/\s*\(.*?\)/g, '');
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = lang;
 
@@ -754,6 +779,11 @@ elements.themeToggleBtn.addEventListener('click', () => {
 elements.settingReadAloud.addEventListener('change', (e) => {
     appSettings.readAloud = e.target.checked;
     saveSetting('numflash_read_aloud', appSettings.readAloud);
+});
+
+elements.settingDifficultyMode.addEventListener('change', (e) => {
+    appSettings.difficultyMode = e.target.value;
+    saveSetting('numflash_difficulty_mode', appSettings.difficultyMode);
 });
 
 elements.summaryResultsList.addEventListener('click', (e) => {
