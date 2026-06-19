@@ -156,4 +156,64 @@ for (let i = 21; i <= 99; i++) {
     }
 }
 
+// Populate numbers 0 to 1000 dynamically for Mandarin (zh-CN)
+const zhDigits = {
+    0: ['零', 'líng'],
+    1: ['一', 'yī'],
+    2: ['二', 'èr'],
+    3: ['三', 'sān'],
+    4: ['四', 'sì'],
+    5: ['五', 'wǔ'],
+    6: ['六', 'liù'],
+    7: ['七', 'qī'],
+    8: ['八', 'bā'],
+    9: ['九', 'jiǔ']
+};
+
+NUMBER_DATA['zh-CN'] = {};
+NUMBER_DATA['zh-CN'][0] = '零 (líng)';
+
+for (let i = 1; i <= 999; i++) {
+    const charParts = [];
+    const pinyinParts = [];
+    
+    const hundreds = Math.floor(i / 100);
+    const remainder = i % 100;
+    
+    if (hundreds > 0) {
+        charParts.push(zhDigits[hundreds][0] + '百');
+        pinyinParts.push(zhDigits[hundreds][1] + ' bǎi');
+        
+        if (remainder > 0 && remainder < 10) {
+            charParts.push('零');
+            pinyinParts.push('líng');
+        }
+    }
+    
+    const tens = Math.floor(remainder / 10);
+    const ones = remainder % 10;
+    
+    if (tens > 0) {
+        if (tens === 1 && hundreds === 0) {
+            charParts.push('十');
+            pinyinParts.push('shí');
+        } else {
+            charParts.push(zhDigits[tens][0] + '十');
+            pinyinParts.push(zhDigits[tens][1] + ' shí');
+        }
+    }
+    
+    if (ones > 0) {
+        charParts.push(zhDigits[ones][0]);
+        pinyinParts.push(zhDigits[ones][1]);
+    }
+    
+    const charStr = charParts.join('');
+    const pinyinStr = pinyinParts.join(' ');
+    
+    NUMBER_DATA['zh-CN'][i] = `${charStr} (${pinyinStr})`;
+}
+NUMBER_DATA['zh-CN'][1000] = '一千 (yī qiān)';
+
+
 

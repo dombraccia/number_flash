@@ -654,7 +654,8 @@ function updateStatsReviewButton() {
 function speak(text, lang) {
     try {
         window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
+        const cleanText = text.replace(/\s*\(.*?\)/g, '');
+        const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = lang;
 
         const voices = window.speechSynthesis.getVoices();

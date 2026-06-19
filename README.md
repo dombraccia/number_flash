@@ -28,8 +28,8 @@ Number Flash works 100% offline once loaded. For the best full-screen experience
 
 ## 🛠️ Supported Features & Languages
 
-* **Current Languages**: French (🇫🇷), Italian (🇮🇹), Spanish (🇪🇸), and Kannada (🇮🇳).
-* **Number Range**: Custom bounds supported up to `1100` (varies by language, e.g., `100` for Kannada).
+* **Current Languages**: French (🇫🇷), Italian (🇮🇹), Spanish (🇪🇸), Kannada (🇮🇳), and Mandarin (🇨🇳).
+* **Number Range**: Custom bounds supported up to `1100` (varies by language, e.g., `100` for Kannada, `1000` for Mandarin).
 * **Flow & Customization**:
   * **Card Order**: Toggle between **Random** and **Sequential** order.
   * **Auto Read Aloud**: Toggled automatic pronunciation on card flip.
