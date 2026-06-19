@@ -28,6 +28,11 @@ export const NUMBER_DATA = {
         11: 'once', 12: 'doce', 13: 'trece', 14: 'catorce', 15: 'quince', 16: 'dieciséis', 17: 'diecisiete', 18: 'dieciocho', 19: 'diecinueve', 20: 'veinte',
         21: 'veintiuno', 22: 'veintidós', 23: 'veintitrés', 24: 'veinticuatro', 25: 'veinticinco', 26: 'veintiséis', 27: 'veintisiete', 28: 'veintiocho', 29: 'veintinueve', 30: 'treinta',
         40: 'cuarenta', 50: 'cincuenta', 60: 'sesenta', 70: 'setenta', 80: 'ochenta', 90: 'noventa', 100: 'cien'
+    },
+    'kn-IN': {
+        0: 'ಸೊನ್ನೆ', 1: 'ಒಂದು', 2: 'ಎರಡು', 3: 'ಮೂರು', 4: 'ನಾಲ್ಕು', 5: 'ಐದು', 6: 'ಆರು', 7: 'ಏಳು', 8: 'ಎಂಟು', 9: 'ಒಂಬತ್ತು', 10: 'ಹತ್ತು',
+        11: 'ಹನ್ನೊಂದು', 12: 'ಹನ್ನೆರಡು', 13: 'ಹದಿಮೂರು', 14: 'ಹದಿನಾಲ್ಕು', 15: 'ಹದಿನೈದು', 16: 'ಹದಿನಾರು', 17: 'ಹದಿನೇಳು', 18: 'ಹದಿನೆಂಟು', 19: 'ಹತ್ತೊಂಬತ್ತು', 20: 'ಇಪ್ಪತ್ತು',
+        30: 'ಮೂವತ್ತು', 40: 'ನಲವತ್ತು', 50: 'ಐವತ್ತು', 60: 'ಅರವತ್ತು', 70: 'ಎಪ್ಪತ್ತು', 80: 'ಎಂಬತ್ತು', 90: 'ತೊಂಬತ್ತು', 100: 'ನೂರು'
     }
 };
 
@@ -121,4 +126,34 @@ for (let i = 1001; i <= 1099; i++) {
     NUMBER_DATA['es-ES'][i] = 'mil ' + NUMBER_DATA['es-ES'][base];
 }
 NUMBER_DATA['es-ES'][1100] = 'mil cien';
+
+// Populate numbers 21 to 99 dynamically for Kannada
+for (let i = 21; i <= 99; i++) {
+    if (NUMBER_DATA['kn-IN'][i]) continue;
+    const tenVal = Math.floor(i / 10) * 10;
+    const unitVal = i % 10;
+    const tenWord = NUMBER_DATA['kn-IN'][tenVal];
+    const stem = tenWord.endsWith('ು') ? tenWord.slice(0, -1) : tenWord;
+    
+    if (unitVal === 1) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೊ' + 'ಂದು';
+    } else if (unitVal === 2) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೆ' + 'ರಡು';
+    } else if (unitVal === 3) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ಮೂರು';
+    } else if (unitVal === 4) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ನಾಲ್ಕು';
+    } else if (unitVal === 5) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೈ' + 'ದು';
+    } else if (unitVal === 6) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ಾ' + 'ರು';
+    } else if (unitVal === 7) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೇ' + 'ಳು';
+    } else if (unitVal === 8) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೆ' + 'ಂಟು';
+    } else if (unitVal === 9) {
+        NUMBER_DATA['kn-IN'][i] = stem + 'ೊ' + 'ಂಬತ್ತು';
+    }
+}
+
 

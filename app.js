@@ -145,6 +145,28 @@ function savePreferences() {
     localStorage.setItem('numflash_reviews_count', elements.reviewsCount.value);
 }
 
+function updateLanguageRangeLimits() {
+    const lang = elements.langSelect.value;
+    const maxLimit = NUMBER_DATA[lang] ? Math.max(...Object.keys(NUMBER_DATA[lang]).map(Number)) : 1100;
+    
+    const label = document.getElementById('range-label');
+    if (label) {
+        label.textContent = `Number Range (0 - ${maxLimit})`;
+    }
+    
+    elements.rangeMin.max = maxLimit;
+    elements.rangeMax.max = maxLimit;
+    elements.reviewsCount.max = maxLimit;
+    
+    let minVal = parseInt(elements.rangeMin.value, 10);
+    let maxVal = parseInt(elements.rangeMax.value, 10);
+    let revVal = parseInt(elements.reviewsCount.value, 10);
+    
+    if (!isNaN(minVal) && minVal > maxLimit) elements.rangeMin.value = maxLimit;
+    if (!isNaN(maxVal) && maxVal > maxLimit) elements.rangeMax.value = maxLimit;
+    if (!isNaN(revVal) && revVal > maxLimit) elements.reviewsCount.value = maxLimit;
+}
+
 function fetchAppVersion() {
     fetch('./sw.js')
         .then(r => r.text())
@@ -162,6 +184,7 @@ function fetchAppVersion() {
 
 // Initialize — go straight to home (no auth needed)
 loadPreferences();
+updateLanguageRangeLimits();
 loadSettings();
 fetchAppVersion();
 views.app.classList.remove('hidden');
@@ -203,8 +226,9 @@ function startSession() {
     if (isNaN(reviews) || reviews <= 0) reviews = 20;
 
     // Clamp range values to dictionary limits
-    min = Math.max(0, Math.min(1100, min));
-    max = Math.max(0, Math.min(1100, max));
+    const maxLimit = NUMBER_DATA[lang] ? Math.max(...Object.keys(NUMBER_DATA[lang]).map(Number)) : 1100;
+    min = Math.max(0, Math.min(maxLimit, min));
+    max = Math.max(0, Math.min(maxLimit, max));
 
     if (min > max) {
         const temp = min;
@@ -531,8 +555,9 @@ function showStats() {
     const allStats = StorageManager.getAllStats();
     const langStats = allStats[lang] || {};
 
+    const maxLimit = NUMBER_DATA[lang] ? Math.max(...Object.keys(NUMBER_DATA[lang]).map(Number)) : 1100;
     const statItems = [];
-    for (let i = 0; i <= 1100; i++) {
+    for (let i = 0; i <= maxLimit; i++) {
         const data = langStats[i] || langStats[String(i)] || { timesStudied: 0, timesCorrect: 0, totalFlipTime: 0 };
         if (data.timesStudied === 0) {
             statItems.push({ number: i, isStudied: false });
@@ -601,9 +626,10 @@ function updateStatsReviewButton() {
     if (elements.filterGettingThere.checked) checkedLevels.push(1);
     if (elements.filterLearned.checked) checkedLevels.push(0);
 
+    const maxLimit = NUMBER_DATA[lang] ? Math.max(...Object.keys(NUMBER_DATA[lang]).map(Number)) : 1100;
     const cardsToReview = [];
     if (checkedLevels.length > 0) {
-        for (let i = 0; i <= 1100; i++) {
+        for (let i = 0; i <= maxLimit; i++) {
             const data = langStats[i] || langStats[String(i)];
             if (data && data.timesStudied > 0) {
                 const info = getCardStatsInfo(i, data, lang);
@@ -675,6 +701,7 @@ elements.incorrectBtn.addEventListener('click', () => recordResult(false));
 elements.correctBtn.addEventListener('click', () => recordResult(true));
 elements.exitBtn.addEventListener('click', exitSession);
 elements.undoBtn.addEventListener('click', handleUndo);
+elements.langSelect.addEventListener('change', updateLanguageRangeLimits);
 
 // Settings Dialog / Events
 elements.settingsBtn.addEventListener('click', () => {
