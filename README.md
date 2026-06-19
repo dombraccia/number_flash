@@ -1,32 +1,29 @@
-# ⚡ Number Flash
+# ⚡ Number Flash ⚡
 
-I’ve always loved learning new languages, but no matter how close to fluent I get, mastering numbers has always been a struggle. Whether listening to phone numbers or counting change, there's always a split-second delay while my brain translates the digits.
+Number Flash is a free web application designed to help language learners improve both accuracy and recall time of numbers in their target language. It uses a flashcard-style interface with smart difficulty analytics incorporating *both* speed and accuracy in recalling numbers, helping you optimize your practice sessions. I built this tool specifically to help me master recalling numbers in French and Italian, a task I have found surprisingly difficult to do quickly and accurately. I hope it can help you too!
 
-I built **Number Flash** to solve this exact bottleneck. It’s designed to train rapid-fire recall, pairing visual numbers with their correct native pronunciation so you can understand them instantly without translating them in your head first.
+## Installation
 
-Because your progress is stored entirely on your device, you can practice anywhere—even completely offline.
+Number Flash is a Progressive Web App (PWA) that can be installed on your device for an app-like experience, without needing to go to the App Store.
 
----
-
-## 📲 How to Install (Offline PWA)
-
-Number Flash works 100% offline once loaded. For the best full-screen experience, install it on your device:
-
-### iOS (iPhone / iPad)
-1. Open **Safari** and navigate to your deployed Number Flash website.
-2. Tap the **Share** button (the square icon with an upward arrow at the bottom of the screen).
+### iPhone / iPad Users
+1. Open **Safari** and open https://dbraccia.com/number-flash
+2. Tap the three-dot menu button and then tap **Share** (looks like a square with an upward arrow).
 3. Scroll down and tap **"Add to Home Screen"**.
 4. Tap **Add** in the top-right corner.
 
-### Android
-1. Open **Chrome** and navigate to the website.
+### Android Users
+> NOTE: I have not tested it on Android, but should work as a standard PWA
+
+1. Open **Chrome** and navigate to https://dbraccia.com/number-flash
 2. Tap the three-dot menu button.
 3. Tap **"Install App"** (or **"Add to Home screen"**).
-4. Follow the prompt to complete the installation.
+4. Follow the prompt to complete the installation. 
 
----
+> [!WARNING]  
+> Aside from initial setup, Number Flash is a 100% offline application, so all of your review data is stored locally on your device's browser. If you clear your browser data or switch devices, your progress is not saved.
 
-## 🛠️ Supported Features & Languages
+## ℹ More Information
 
 * **Current Languages**: French (🇫🇷), Italian (🇮🇹), Spanish (🇪🇸), Kannada (🇮🇳), and Mandarin (🇨🇳).
 * **Number Range**: Custom bounds supported up to `1100` (varies by language, e.g., `100` for Kannada, `1000` for Mandarin).
