@@ -4,7 +4,8 @@ Number Flash is a free web application designed to help language learners improv
 
 ## Installation
 
-Number Flash is a Progressive Web App (PWA) that can be installed on your device for an app-like experience, without needing to go to the App Store.
+> [!WARNING]  
+> Aside from initial setup and occasional updates, Number Flash is a 100% offline application, therefore all of your review data is stored locally in your device's browser. If you clear your browser data or switch browsers, your progress does not update.
 
 ### iPhone / iPad Users
 1. Open **Safari** and open https://dbraccia.com/number-flash
@@ -20,8 +21,6 @@ Number Flash is a Progressive Web App (PWA) that can be installed on your device
 3. Tap **"Install App"** (or **"Add to Home screen"**).
 4. Follow the prompt to complete the installation. 
 
-> [!WARNING]  
-> Aside from initial setup, Number Flash is a 100% offline application, so all of your review data is stored locally on your device's browser. If you clear your browser data or switch devices, your progress is not saved.
 
 ## ℹ More Information
 
