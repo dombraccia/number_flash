@@ -1,7 +1,7 @@
 {
     "name": "Number Flash",
     "short_name": "NumFlash",
-    "description": "Learn numbers in French and Italian with flashcards",
+    "description": "Learn numbers in French, Italian, Spanish, Kannada, and Mandarin with flashcards",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",

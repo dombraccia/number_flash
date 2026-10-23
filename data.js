@@ -119,11 +119,7 @@ for (let i = 1001; i <= 9999; i++) {
     } else {
         const baseStr = NUMBER_DATA['it-IT'][remainder];
         if (thousands === 1) {
-            if (baseStr.startsWith('o')) {
-                NUMBER_DATA['it-IT'][i] = 'mill' + baseStr;
-            } else {
-                NUMBER_DATA['it-IT'][i] = 'mille' + baseStr;
-            }
+            NUMBER_DATA['it-IT'][i] = 'mille' + baseStr;
         } else {
             const multiplier = NUMBER_DATA['it-IT'][thousands];
             NUMBER_DATA['it-IT'][i] = multiplier + 'mila' + baseStr;
@@ -243,6 +239,5 @@ for (let i = 1; i <= 999; i++) {
     NUMBER_DATA['zh-CN'][i] = `${charStr}\n${pinyinStr}`;
 }
 NUMBER_DATA['zh-CN'][1000] = '一千\nyī qiān';
-
 
 

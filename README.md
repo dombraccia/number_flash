@@ -5,7 +5,7 @@ Number Flash is a free web application designed to help language learners improv
 ## Installation
 
 > [!WARNING]  
-> Aside from initial setup and occasional updates, Number Flash is 100% offline, so you're history is never backed up to the cloud. Therefore, if you clear your browser data or switch browsers, your progress will not follow you.
+> Aside from initial setup and occasional updates, Number Flash works offline, so your history is never backed up to the cloud. If you clear your browser data or switch browsers, your progress will not follow you.
 
 ### iPhone / iPad Users
 1. Open **Safari** and open https://dbraccia.com/number-flash

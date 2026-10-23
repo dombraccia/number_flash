@@ -50,7 +50,7 @@ const elements = {
     filterGettingThere: document.getElementById('filter-getting-there'),
     filterLearned: document.getElementById('filter-learned'),
     statsReviewBtn: document.getElementById('stats-review-btn'),
-    clearCacheBtn: document.getElementById('clear-cache-btn'),
+    clearDataBtn: document.getElementById('clear-data-btn'),
     refreshAppBtn: document.getElementById('refresh-app-btn'),
     settingsVersion: document.getElementById('settings-version'),
     undoBtn: document.getElementById('undo-btn'),
@@ -70,6 +70,8 @@ let sessionData = {
 };
 
 let canFlipCard = true;
+let canGradeCard = false;
+let advanceTimeout = null;
 
 let appSettings = {
     darkMode: true,
@@ -94,7 +96,7 @@ function loadSettings() {
     appSettings.showAvgTime = sat === null ? false : sat === 'true';
     appSettings.randomOrder = ro === null ? true : ro === 'true';
     appSettings.readAloud = ra === null ? true : ra === 'true';
-    appSettings.difficultyMode = diff || 'medium';
+    appSettings.difficultyMode = ['easy', 'medium', 'hard'].includes(diff) ? diff : 'medium';
 
     elements.settingDarkMode.checked = appSettings.darkMode;
     elements.settingShowPercent.checked = appSettings.showPercent;
@@ -161,7 +163,7 @@ function updateLanguageRangeLimits() {
     
     elements.rangeMin.max = maxLimit;
     elements.rangeMax.max = maxLimit;
-    elements.reviewsCount.max = maxLimit;
+    elements.reviewsCount.max = maxLimit + 1;
     
     let minVal = parseInt(elements.rangeMin.value, 10);
     let maxVal = parseInt(elements.rangeMax.value, 10);
@@ -324,6 +326,11 @@ function exitSession() {
         clearInterval(countdownInterval);
         countdownInterval = null;
     }
+    if (advanceTimeout) {
+        clearTimeout(advanceTimeout);
+        advanceTimeout = null;
+    }
+    canFlipCard = false;
     endSession(true);
 }
 
@@ -336,6 +343,7 @@ function showNextCard() {
     const number = sessionData.numbers[sessionData.currentIndex];
     elements.cardFront.textContent = number;
     elements.cardBack.textContent = '';
+    canGradeCard = false;
 
     // Ensure card is not flipped when showing next
     elements.flashcard.classList.remove('flipped');
@@ -376,6 +384,7 @@ function flipCard() {
     elements.cardBack.textContent = answer;
     elements.flashcard.classList.add('flipped');
     elements.controls.classList.remove('hidden');
+    canGradeCard = true;
 
     if (appSettings.readAloud) {
         try {
@@ -387,6 +396,8 @@ function flipCard() {
 }
 
 function recordResult(isCorrect) {
+    if (!canGradeCard) return;
+    canGradeCard = false;
     canFlipCard = false; // Disable card tapping while transition runs
     const number = sessionData.numbers[sessionData.currentIndex];
     sessionData.results.push({
@@ -403,7 +414,10 @@ function recordResult(isCorrect) {
 
     sessionData.currentIndex++;
 
-    setTimeout(() => showNextCard(), 400);
+    advanceTimeout = setTimeout(() => {
+        advanceTimeout = null;
+        showNextCard();
+    }, 400);
 }
 
 // Difficulty Threshold Configurations
@@ -786,29 +800,15 @@ elements.settingDifficultyMode.addEventListener('change', (e) => {
     saveSetting('numflash_difficulty_mode', appSettings.difficultyMode);
 });
 
-elements.summaryResultsList.addEventListener('click', (e) => {
-    const card = e.target.closest('.stat-item');
-    if (card) {
-        const btn = card.querySelector('.speak-btn');
-        if (btn) {
-            const word = btn.getAttribute('data-word');
-            const l = btn.getAttribute('data-lang');
-            speak(word, l);
-        }
+function handleSpeakClick(e) {
+    const button = e.target.closest('.speak-btn');
+    if (button && e.currentTarget.contains(button)) {
+        speak(button.dataset.word, button.dataset.lang);
     }
-});
+}
 
-elements.statsList.addEventListener('click', (e) => {
-    const card = e.target.closest('.stat-item');
-    if (card) {
-        const btn = card.querySelector('.speak-btn');
-        if (btn) {
-            const word = btn.getAttribute('data-word');
-            const l = btn.getAttribute('data-lang');
-            speak(word, l);
-        }
-    }
-});
+elements.summaryResultsList.addEventListener('click', handleSpeakClick);
+elements.statsList.addEventListener('click', handleSpeakClick);
 
 // Summary Page Retrain Option
 elements.retrainBtn.addEventListener('click', () => {
@@ -829,8 +829,8 @@ elements.statsReviewBtn.addEventListener('click', () => {
     }
 });
 
-// Clear Cache & Reset App Data Option
-elements.clearCacheBtn.addEventListener('click', () => {
+// Clear stored progress and preferences
+elements.clearDataBtn.addEventListener('click', () => {
     const confirmed = confirm("Are you sure you want to clear all stored statistics and reset your progress? This cannot be undone.");
     if (confirmed) {
         const keys = [
@@ -843,18 +843,10 @@ elements.clearCacheBtn.addEventListener('click', () => {
             'numflash_show_percent',
             'numflash_show_avg_time',
             'numflash_random_order',
-            'numflash_read_aloud'
+            'numflash_read_aloud',
+            'numflash_difficulty_mode'
         ];
         keys.forEach(k => localStorage.removeItem(k));
-        
-        if ('caches' in window) {
-            caches.keys().then(names => {
-                for (let name of names) {
-                    caches.delete(name);
-                }
-            });
-        }
-        
         window.location.reload();
     }
 });
@@ -865,13 +857,12 @@ elements.refreshAppBtn.addEventListener('click', () => {
     elements.refreshAppBtn.textContent = "Updating...";
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(registrations => {
-            const promises = registrations.map(reg => reg.unregister());
-            return Promise.all(promises);
+        navigator.serviceWorker.getRegistration().then(registration => {
+            return registration ? registration.unregister() : undefined;
         }).then(() => {
             if ('caches' in window) {
                 return caches.keys().then(keys => {
-                    return Promise.all(keys.map(key => caches.delete(key)));
+                    return Promise.all(keys.filter(key => key.startsWith('numflash-')).map(key => caches.delete(key)));
                 });
             }
         }).then(() => {
